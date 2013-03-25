@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VS2012-Javascript-Intellisense", "src\Javascript-FastClass.csproj", "{0451BAEF-DF2E-4B98-8644-94EE9415E389}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{CF399000-54A8-4A46-9830-FC39DDE699D0}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\fart.exe = .nuget\fart.exe
+		.nuget\MakePP.bat = .nuget\MakePP.bat
+		.nuget\nuget.bat = .nuget\nuget.bat
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+		.nuget\NuGetPackage.ps1 = .nuget\NuGetPackage.ps1
+		.nuget\NuGetSetup.ps1 = .nuget\NuGetSetup.ps1
+		.nuget\transform_all.bat = .nuget\transform_all.bat
+		.nuget\UnmakePP.bat = .nuget\UnmakePP.bat
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		NuPack|Any CPU = NuPack|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0451BAEF-DF2E-4B98-8644-94EE9415E389}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0451BAEF-DF2E-4B98-8644-94EE9415E389}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0451BAEF-DF2E-4B98-8644-94EE9415E389}.NuPack|Any CPU.ActiveCfg = NuPack|Any CPU
+		{0451BAEF-DF2E-4B98-8644-94EE9415E389}.NuPack|Any CPU.Build.0 = NuPack|Any CPU
+		{0451BAEF-DF2E-4B98-8644-94EE9415E389}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0451BAEF-DF2E-4B98-8644-94EE9415E389}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
