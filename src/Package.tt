@@ -1,0 +1,41 @@
+﻿<!--<#@ template language="C#" #>
+<#@ output extension=".nuspec" #>
+<# WriteLine("<?xml version=\"1.0\" encoding=\"utf-8\"?>"); #>
+-->
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>Javascript-FastClass</id>
+    <version><![CDATA[1.0.<#= this.RevisionNumber #>.<#= this.BuildNumber #>]]></version>
+    <title>Fast Class Javascript Inheritance</title>
+    <authors>DotNetWise</authors>
+    <description>A fast and lightest prototype inheritance when you can't use any complied library such as TypeScript or Google Closure</description>
+    <owners>DotNetWise</owners>
+    <releaseNotes>
+    </releaseNotes>
+    <summary>
+    </summary>
+    <language>en-US</language>
+    <projectUrl>https://github.com/DotNetWise/Javascript-FastClass</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <iconUrl>https://raw.github.com/wiki/dotnetwise/Javascript-FastClass/images/NugetIcon.png</iconUrl>
+    <!--<licenseUrl></licenseUrl>-->
+    <copyright>Copyright &amp;copy; DotNetWise 2013. This is an open-source project, you can edit and use it for free. Share!</copyright>
+    <dependencies>
+      <group targetFramework="net40">
+      </group>
+    </dependencies>
+    <frameworkAssemblies>
+    </frameworkAssemblies>
+    <references></references>
+    <tags>Javascript,prototype,inheritance,FastClass,fast,class</tags>
+  </metadata>
+  <files>
+    <file src="lib\" target="lib" />
+    <file src="tools\" target="tools" />
+    <file src="content\" target="content" />
+  </files>
+</package>
+<#+
+  int RevisionNumber = DateTime.UtcNow.Month * 100 + DateTime.UtcNow.Day;
+int BuildNumber = DateTime.UtcNow.Hour * 100 + DateTime.UtcNow.Minute;
+#>
