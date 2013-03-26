@@ -1,1 +1,1 @@
-﻿/// <reference path="FastClass.js" />
+﻿
