@@ -87,8 +87,8 @@
     </None>
     <None Include="Package.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>Package.nuspec</LastGenOutput>
       <SubType>Designer</SubType>
+      <LastGenOutput>Package.nuspec</LastGenOutput>
     </None>
     <None Include="packages.config" />
     <None Include="Scripts\jquery-1.9.1.min.map">

@@ -3,7 +3,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
     <id>Javascript-FastClass</id>
-    <version><![CDATA[1.0.325.1747]]></version>
+    <version><![CDATA[1.0.326.141944]]></version>
     <title>Fast Class Javascript Inheritance</title>
     <authors>DotNetWise</authors>
     <description>A fast and lightest prototype inheritance when you can't use any complied library such as TypeScript or Google Closure</description>
@@ -15,12 +15,10 @@
     <language>en-US</language>
     <projectUrl>https://github.com/DotNetWise/Javascript-FastClass</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <iconUrl>https://raw.github.com/wiki/dotnetwise/Javascript-FastClass/images/NugetIcon.png</iconUrl>
+    <iconUrl>https://raw.github.com/wiki/dotnetwise/Javascript-FastClass/images/Icon32.png</iconUrl>
     <!--<licenseUrl></licenseUrl>-->
-    <copyright>Copyright &amp;copy; DotNetWise 2013. This is an open-source project, you can edit and use it for free. Share!</copyright>
+    <copyright>Copyright DotNetWise 2013. This is an open-source project, you can edit and use it for free. Share!</copyright>
     <dependencies>
-      <group targetFramework="net40">
-      </group>
     </dependencies>
     <frameworkAssemblies>
     </frameworkAssemblies>

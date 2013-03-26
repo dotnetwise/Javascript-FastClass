@@ -11,9 +11,7 @@ $file = $project.ProjectItems | ForEach-Object { $_.ProjectItems } | where { $_.
 if($file) {
     $file.Open()
     $file.Document.Activate()
-    $file.Document.Selection.SelectAll()
+    #$file.Document.Selection.SelectAll() 
     $file.Document.Selection.StartOfDocument()
-    $file.Document.Selection.Find('/// <reference path="_vs2012.intallisense.js" />
-')
-	$file.Document.Selection.Delete()
-}
+	$file.Document.ReplaceText("/// <reference path=`"FastClass.js`" />`n", "")
+} 

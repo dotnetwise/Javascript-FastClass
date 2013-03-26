@@ -17,12 +17,10 @@
     <language>en-US</language>
     <projectUrl>https://github.com/DotNetWise/Javascript-FastClass</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <iconUrl>https://raw.github.com/wiki/dotnetwise/Javascript-FastClass/images/NugetIcon.png</iconUrl>
+    <iconUrl>https://raw.github.com/wiki/dotnetwise/Javascript-FastClass/images/Icon32.png</iconUrl>
     <!--<licenseUrl></licenseUrl>-->
-    <copyright>Copyright &amp;copy; DotNetWise 2013. This is an open-source project, you can edit and use it for free. Share!</copyright>
+    <copyright>Copyright DotNetWise <#= DateTime.Now.Year #>. This is an open-source project, you can edit and use it for free. Share!</copyright>
     <dependencies>
-      <group targetFramework="net40">
-      </group>
     </dependencies>
     <frameworkAssemblies>
     </frameworkAssemblies>
@@ -37,5 +35,5 @@
 </package>
 <#+
   int RevisionNumber = DateTime.UtcNow.Month * 100 + DateTime.UtcNow.Day;
-int BuildNumber = DateTime.UtcNow.Hour * 100 + DateTime.UtcNow.Minute;
+int BuildNumber = DateTime.UtcNow.Hour * 10000 + DateTime.UtcNow.Minute * 100 + DateTime.UtcNow.Second;
 #>

@@ -7,14 +7,11 @@ param($installPath, $toolsPath, $package, $project)
 # $package is a reference to the package object.
 # $project is a reference to the project the package was installed to.
 
-#$file = $project.ProjectItems | ForEach-Object { $_.ProjectItems } | where { $_.Name -eq "_references.js" }
-#if($file) {
-#    $file.Open()
-#    $file.Document.Activate()
-#    $file.Document.Selection.SelectAll()
-#    $file.Document.Selection.StartOfDocument()
-#    $file.Document.Selection.Insert('/// <reference path="_vs2012.intallisense.js" />
-#')
-#	$file.Document.Selection.Delete()
-#}
+$file = $project.ProjectItems | ForEach-Object { $_.ProjectItems } | where { $_.Name -eq "_references.js" }
+if($file) {
+    $file.Open()
+    $file.Document.Activate()
+    $file.Document.Selection.StartOfDocument()
+	$file.Document.Selection.Insert("/// <reference path=`"FastClass.js`" />`n")
+}
  
