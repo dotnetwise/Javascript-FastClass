@@ -23,7 +23,7 @@ e.g. <a href="https://developers.google.com/closure/" target="_blank">Google Clo
 
 ## What?
 FastClass is a very tiny library (<0.5KB minified and gzipped) that helps you quickly derrive your `classes` so to speak. 
-It comes into two flavours:
+It comes in two flavours:
 * [`Function.prototype.fastClass(creator)`](#fastclass-flavour) - fastest, does not iterate the members when creates the derrived function
 * [`Function.prototype.inheritWith(creator)`](#inheritwith-flavour) - a little bit slower as it iterates the members `for (var i in newPrototype)` of the new prototype
 In both cases creator should be a function that looks like this:
