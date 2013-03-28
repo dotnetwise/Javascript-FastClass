@@ -25,7 +25,7 @@ In both cases creator should be a function that looks like this:
 ```javascript
 function(base, baseCtor) { return ... }
 ```
-whereas `baseCtor` is the function we want to inherit and base is it's prototype (`baseCtor.prototype` that is).
+whereas `baseCtor` is the function we want to inherit and base is it's prototype *(`baseCtor.prototype` that is).*
 
 ## How?
 
