@@ -99,9 +99,6 @@ figure.draw();
 ```
 
 ## Another clasical example
-### Usage
-
-`[[constructor]].fastClass( function )` - that function is called `creator` of the inherited prototype
 
 #### Example
 
@@ -128,6 +125,11 @@ var animal = new Animal(); // Create a new Animal instance
 ```
 
 ### Inheritance
+
+#### Usage
+
+`[[constructor]].inheritWith( function(base, baseCtor) { return {...} } )` - that function is called `creator` of the derrived prototype
+
 
 ```javascript
 // Extend the Animal class with inheritWith flavor
@@ -159,23 +161,30 @@ husky.scare(); // "Dog::I scare you'"
 
 #### Accessing parent prototype
 
+#### Usage
+
+`[[constructor]].inheritWith( function(base, baseCtor) { this.m = function {...} ... } )` - that function is the `creator` of the derrived prototype
 Every class definition has access to the parent's prototype via the first argument passed into the function. The second argument is the base Class itself (constructor):
 
 ```javascript
 // Same as above but Extend the Animal class using fastClass flavor
 var Dog = Animal.fastClass(function(base, baseCtor) {
+    //private functions
     function someOtherPrivateMethod() {};
-    //the cosntructor will be automatically added for us
+    
+    //since we don't set this.constructor, automatically will be added one for us which will call the baseCtor with all the provided arguments
+    //this is importat so we can set the new prototype into it
+    
     // Override base class `method1`
     this.method1 = function(){
         someOtherPrivateMethod.call(this);
-        // Call the parent method
+        // Call the parent function
         base.method1.call(this);
     };
     this.scare = function(){
         console.log('Dog::I scare you');
     };
-    //some more public methods
+    //some more public functions
     this.method2 = function() {};
 });
 ```
