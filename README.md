@@ -2,11 +2,12 @@ Javascript-fastClass
 ====================
 A faster and easier Javascript Inheritance 
 
+
 *  <a href="http://jsperf.com/js-inheritance-performance/25" target="_blank"><code>Performance Tests</code></a>
 *  <a href="http://jsperf.com/js-inheritance-performance/26" target="_blank"><code>Performance Tests among fastest only</code></a>
 
 <div align="center">
-<img src="../../wiki/images/NugetIcon.png" />
+<img src="../../wiki/images/NugetIcon.png"/>
 </div>
 
 ## Why yet another library?
@@ -37,7 +38,7 @@ whereas `baseCtor` is the function we want to inherit and base is it's prototype
 
 ## How to use it?
 
-The `base class`:
+### The base "class"
 ```javascript
 var Figure = function(name) {
     this.name = name;
@@ -87,7 +88,7 @@ However the `.inheritWith` flavour comes with about 15-25% <a href="http://jsper
 
 #### Usage
 
-Whichever flavour you have chosen the usage code is the same. Firstly you need to instantiate the constructors with the `new` operator:
+Whichever flavour you choose the code usage is the same. Firstly you need to instantiate the Constructor with the `new` operator:
 ```javascript
 var figure = new Figure("generic");
 figure.draw();
@@ -204,7 +205,7 @@ var A = function(name) {
 }) 
 ```
 
-The `define` function sets all the members of the provided object to the `function.prorortpe` *(`A.prototype` that is)* and returns it *(`A` that is)*
+The `define` function copies all the members of the returned object to the `function.prorortpe` *(`A.prototype`)* and returns it *(`A`)*
 
 
 ## Where?
