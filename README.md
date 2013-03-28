@@ -56,7 +56,7 @@ var Square = Figure.fastClass(function(base, baseCtor) {
 })
 ```
 
-### `.inheritWith` flvaour:
+### `.inheritWith` flavour:
 
 To define the `derrived class` Square:
 ```javascript
