@@ -49,16 +49,14 @@ A classical example to use inheritance when you have a base class called `Figure
 To define the `derrived class` Square:
 ```javascript
 var Square = Figure.fastClass(function(base, baseCtor) {
-    return function() {
-        this.constructor = function(name, length) { 
-          this.length = length;
-          baseCtor.call(this, name);
-        }
-        this.draw = function() {
-          console.log("square with length " + this.length);
-          base.draw.call(this);
-        }
-    }   
+    this.constructor = function(name, length) { 
+      this.length = length;
+      baseCtor.call(this, name);
+    }
+    this.draw = function() {
+      console.log("square with length " + this.length);
+      base.draw.call(this);
+    }
 })
 ```
 
@@ -67,18 +65,16 @@ var Square = Figure.fastClass(function(base, baseCtor) {
 To define the `derrived class` Square:
 ```javascript
 var Square = Figure.inheritWith(function(base, baseCtor) {
-    return function() {
-        return { 
-          constructor:  function(name, length) { 
+    return { 
+        constructor:  function(name, length) { 
             this.length = length;
             baseCtor.call(this, name);
-          },
-          draw: function() {
+        },
+        draw: function() {
             console.log("square with length " + this.length);
             base.draw.call(this);
-          }
         }
-    }   
+    }
 })
 ```
 
@@ -165,21 +161,19 @@ Every class definition has access to the parent's prototype via the first argume
 ```javascript
 // Same as above but Extend the Animal class using fastClass flavor
 var Dog = Animal.fastClass(function(base, baseCtor) {
-    return function() {
-        function someOtherPrivateMethod() {}
-        //the cosntructor will be automatically added for us
-        // Override base class `method1`
-        this.method1 = function(){
-            someOtherPrivateMethod.call(this);
-            // Call the parent method
-            base.method1.call(this);
-        };
-        this.scare = function(){
-            console.log('Dog::I scare you');
-        }
-        //some more public methods
-        this.method2 = function() {};
-    }
+    function someOtherPrivateMethod() {};
+    //the cosntructor will be automatically added for us
+    // Override base class `method1`
+    this.method1 = function(){
+        someOtherPrivateMethod.call(this);
+        // Call the parent method
+        base.method1.call(this);
+    };
+    this.scare = function(){
+        console.log('Dog::I scare you');
+    };
+    //some more public methods
+    this.method2 = function() {};
 });
 ```
 
