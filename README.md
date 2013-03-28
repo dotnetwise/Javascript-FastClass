@@ -23,7 +23,7 @@ e.g. <a href="https://developers.google.com/closure/" target="_blank">Google Clo
 
 ## What?
 FastClass is a very tiny library (<0.5KB minified and gzipped) that helps you quickly derrive your `classes` so to speak. 
-It comes into two flavours:
+It comes in two flavours:
 * [`Function.prototype.fastClass(creator)`](#fastclass-flavour) - fastest, does not iterate the members when creates the derrived function
 * [`Function.prototype.inheritWith(creator)`](#inheritwith-flavour) - a little bit slower as it iterates the members `for (var i in newPrototype)` of the new prototype
 In both cases creator should be a function that looks like this:
@@ -97,6 +97,90 @@ var square = new Square("10cm square", 10);
 figure.draw(); 
 //square with length 10
 //figure 10cm square
+```
+
+## Another clasical example
+### Usage
+
+`[[constructor]].fastClass( function )` - that function is called `creator` of the inherited prototype
+
+#### Example
+
+```javascript
+// Animal base class
+function Animal() {
+    // Private
+    function private1(){}
+    function private2(){}
+
+    // Privileged - on instance
+    this.privileged1 = function(){}
+    this.privileged2 = function(){}
+}.define({ 
+    // Public - on prototype
+    method1: function(){}
+});
+```
+
+The `function Animal` method acts as the constructor, which is invoked when an instance is created:
+
+```javascript
+var animal = new Animal(); // Create a new Animal instance
+```
+
+### Inheritance
+
+```javascript
+// Extend the Animal class with inheritWith flavor
+var Dog = Animal.inheritWith(function(base, baseCtor) {
+    //derrived class containing some private method(s)
+    function someOtherPrivateMethod() { }
+    
+    return {
+        // Override base class `method1`
+        method1: function(){
+            someOtherPrivateMethod.call(this);
+            console.log('dog::method1');
+        },
+        scare: function(){
+            console.log('Dog::I scare you');
+        },
+        //some new public method(s)
+        method2: function() { }
+    }
+});
+```
+
+Create an instance of `Dog`:
+
+```javascript
+var husky = new Dog();
+husky.scare(); // "Dog::I scare you'"
+```
+
+#### Accessing parent prototype
+
+Every class definition has access to the parent's prototype via the first argument passed into the function. The second argument is the base Class itself (constructor):
+
+```javascript
+// Same as above but Extend the Animal class using fastClass flavor
+var Dog = Animal.fastClass(function(base, baseCtor) {
+    return function() {
+        function someOtherPrivateMethod() {}
+        //the cosntructor will be automatically added for us
+        // Override base class `method1`
+        this.method1 = function(){
+            someOtherPrivateMethod.call(this);
+            // Call the parent method
+            base.method1.call(this);
+        };
+        this.scare = function(){
+            console.log('Dog::I scare you');
+        }
+        //some more public methods
+        this.method2 = function() {};
+    }
+});
 ```
 
 ### Some gems
