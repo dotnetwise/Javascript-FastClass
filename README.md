@@ -77,6 +77,7 @@ var Square = Figure.inheritWith(function(base, baseCtor) {
 ```
 
 As you can see in both cases the definition is pretty simple and very similar. 
+
 However the `.inheritWith` flavour comes with about 15-25% <a href="http://jsperf.com/js-inheritance-performance/25" target="_blank"><code>performance cost</code></a> depending on the actual browser and number of members.
 
 ### Usage
@@ -92,10 +93,9 @@ figure.draw();
 //figure
 ```
 
-# Where?
+## Where?
 Beside GitHub, you can download it as a <a href="http://nuget.org/packages/Javascript-FastClass/" target="_blank"><code>Nuget package</code></a> in Visual Studio from<a href="http://nuget.org/packages/Javascript-FastClass/" target="_blank"><code>here</code></a>
 ```javascript
 Install-Package Javascript-FastClass
 ```
 
-# How?
