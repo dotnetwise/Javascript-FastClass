@@ -29,15 +29,15 @@ whereas `baseCtor` is the function we want to inherit and base is it's prototype
 
 ## How?
 
-A classical example to use inheritance when you have a `base class` called `Figure` and a derrived class called `Square`.
-
 The `base class`:
 ```javascript
-var Figure = function() {
+var Figure = function(name) {
+    this.name = name;
 }
-Figure.prototype.draw = function() { console.log("figure"); }
+Figure.prototype.draw = function() { console.log("figure " + name); }
 ```
 
+A classical example to use inheritance when you have a base class called `Figure` and a derrived class called `Square`.
 
 ### `.fastClass` flvaour:
 
@@ -45,9 +45,9 @@ To define the `derrived class` Square:
 ```javascript
 var Square = Figure.fastClass(function(base, baseCtor) {
     return function() {
-        this.constructor = function(length) { 
+        this.constructor = function(name, length) { 
           this.length = length;
-          baseCtor.call(this);
+          baseCtor.call(this, name);
         }
         this.draw = function() {
           console.log("square with length " + this.length);
@@ -64,9 +64,9 @@ To define the `derrived class` Square:
 var Square = Figure.inheritWith(function(base, baseCtor) {
     return function() {
         return { 
-          constructor:  function(length) { 
+          constructor:  function(name, length) { 
             this.length = length;
-            baseCtor.call(this);
+            baseCtor.call(this, name);
           },
           draw: function() {
             console.log("square with length " + this.length);
@@ -85,14 +85,32 @@ However the `.inheritWith` flavour comes with about 15-25% <a href="http://jsper
 
 Whichever flavour you have chosenm the usage code is the same. You need to use the constructors:
 ```javascript
-var figure = new Figure(10);
+var figure = new Figure("generic");
 figure.draw();
-//figure
-var square = new Square(10);
+//figure generic
+var square = new Square("10cm square", 10);
 figure.draw(); 
 //square with length 10
-//figure
+//figure 10cm square
 ```
+
+### Some gems
+Although it could hurt `hard-core performance` in real live it doesn't feel much of a difference betweeen `.innerWith` and `.fastClass` upon same browser. 
+Between different browsers is a whole different story.
+
+However, for those cases where you don't count every performance bit then you can also define de primary function like this:
+```javascript
+var A = function(name) { 
+    this.name = name; 
+}.define({
+    draw: function() {
+        console.log("figure "+ this.name);
+    }
+}) 
+```
+
+The `define` function sets all the members of the provided object to the `function.prorortpe` (`A.prototype` that is) and returns the it (`A` that is)
+
 
 ## Where?
 Beside GitHub, you can download it as a <a href="http://nuget.org/packages/Javascript-FastClass/" target="_blank"><code>Nuget package</code></a> in Visual Studio from<a href="http://nuget.org/packages/Javascript-FastClass/" target="_blank"><code>here</code></a>
@@ -100,3 +118,5 @@ Beside GitHub, you can download it as a <a href="http://nuget.org/packages/Javas
 Install-Package Javascript-FastClass
 ```
 
+## What's next?
+Do you have a better & faster way? Share it! We would love to seeing creativity in action!
