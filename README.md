@@ -18,8 +18,8 @@ You do need this library when you can't use a language that [`compiles`](https:/
 ## What?
 FastClass is a very tiny library (<0.5KB minified and gzipped) that helps you quickly derrive your `classes` so to speak. 
 It comes into two flavours:
-* [`Function.prototype.fastClass(creator)`](#.fastClass flavour) - fastest, does not iterate the members when creates the derrived function
-* [`Function.prototype.inheritWith(creator)`](#.inheritWith flavour) - a little bit slower as it iterates the members `for (var i in newPrototype)` of the new prototype
+* [`Function.prototype.fastClass(creator)`](#fastClass-flavour) - fastest, does not iterate the members when creates the derrived function
+* [`Function.prototype.inheritWith(creator)`](#inheritWith-flavour) - a little bit slower as it iterates the members `for (var i in newPrototype)` of the new prototype
 In both cases creator should be a function that looks like this:
 ```javascript
 function(base, baseCtor) { return ... }
