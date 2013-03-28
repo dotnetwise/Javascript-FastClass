@@ -99,7 +99,7 @@ figure.draw();
 //figure 10cm square
 ```
 
-## A clasical example
+## Another clasical example
 ### Usage
 
 `[[constructor]].fastClass( function )` - that function is called `creator` of the inherited prototype
@@ -133,14 +133,20 @@ var animal = new Animal(); // Create a new Animal instance
 ```javascript
 // Extend the Animal class with inheritWith flavor
 var Dog = Animal.inheritWith(function(base, baseCtor) {
+    //derrived class containing some private method(s)
+    function someOtherPrivateMethod() { }
+    
     return {
         // Override base class `method1`
         method1: function(){
+            someOtherPrivateMethod.call(this);
             console.log('dog::method1');
         },
         scare: function(){
             console.log('Dog::I scare you');
-        }
+        },
+        //some new public method(s)
+        method2: function() { }
     }
 });
 ```
@@ -160,15 +166,19 @@ Every class definition has access to the parent's prototype via the first argume
 // Same as above but Extend the Animal class using fastClass flavor
 var Dog = Animal.fastClass(function(base, baseCtor) {
     return function() {
+        function someOtherPrivateMethod() {}
         //the cosntructor will be automatically added for us
         // Override base class `method1`
         this.method1 = function(){
+            someOtherPrivateMethod.call(this);
             // Call the parent method
             base.method1.call(this);
         };
         this.scare = function(){
             console.log('Dog::I scare you');
         }
+        //some more public methods
+        this.method2 = function() {};
     }
 });
 ```
