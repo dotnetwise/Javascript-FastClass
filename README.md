@@ -128,7 +128,7 @@ var animal = new Animal(); // Create a new Animal instance
 
 #### Usage
 
-`[[constructor]].inheritWith( function(base, baseCtor) { return {...} } )` - that function is called `creator` of the derrived prototype
+`[[constructor]].inheritWith( function(base, baseCtor) { return {...} } )` - that function should `return` methods for the derrived prototype
 
 
 ```javascript
@@ -163,7 +163,7 @@ husky.scare(); // "Dog::I scare you'"
 
 #### Usage
 
-`[[constructor]].inheritWith( function(base, baseCtor) { this.m = function {...} ... } )` - that function is the `creator` of the derrived prototype
+`[[constructor]].inheritWith( function(base, baseCtor) { this.m = function {...} ... } )` - that function `populates` the derrived prototype
 Every class definition has access to the parent's prototype via the first argument passed into the function. The second argument is the base Class itself (constructor):
 
 ```javascript
