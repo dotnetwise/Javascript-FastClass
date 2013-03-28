@@ -85,7 +85,7 @@ However the `.inheritWith` flavour comes with about 15-25% <a href="http://jsper
 
 ### Usage
 
-Whichever flavour you have chosenm the usage code is the same. You need to use the constructors:
+Whichever flavour you have chosen the usage code is the same. Firstly you need to instantiate the constructors with the `new` operator:
 ```javascript
 var figure = new Figure("generic");
 figure.draw();
