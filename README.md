@@ -1,6 +1,6 @@
 Javascript-FastClass
 ====================
-
+|:-![AAA](../../wiki/images/NugetIcon.png)-:|
 Fast Javascript Inheritance 
 
 *  <a href="http://jsperf.com/js-inheritance-performance/25" target="_blank"><code>Performance Tests</code></a>
