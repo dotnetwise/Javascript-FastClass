@@ -7,9 +7,10 @@ Fast Javascript Inheritance
 *  <a href="http://jsperf.com/js-inheritance-performance/26" target="_blank"><code>Performance Tests among fastest only</code></a>
 
 ## Why?
-Native Javascript Inheritance is a pin in the ass. Even if you understand it perfectly it still requires some hidous repetivie code.
+Native Javascript Inheritance is a pin in the ass. Even if you understand it perfectly it still requires some hideous repetivie code.
 
 There are a lot of libraries which aims to help you with such that, but the main question is:
+
 What is <a href="http://jsperf.com/js-inheritance-performance/25" target="_blank"><code>the fastest</code></a> vs <a target="_blank" href="https://github.com/njoubert/inheritance.js/blob/master/INHERITANCE.md"><code>most convenient</code></a> to create <a href="http://msdn.microsoft.com/en-us/magazine/ff852808.aspx" target="_blank"><code>Prototypal Inheritance</code></a> with?
 
 ## When?
