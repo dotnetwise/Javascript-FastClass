@@ -47,23 +47,23 @@ Figure.prototype.draw = function() { console.log("figure " + name); }
 
 A classical example to use inheritance when you have a base class called `Figure` and a derrived class called `Square`.
 
-### `.fastClass` flvaour:
+#### `.fastClass` flvaour
 
 To define the `derrived class` Square:
 ```javascript
 var Square = Figure.fastClass(function(base, baseCtor) {
     this.constructor = function(name, length) { 
       this.length = length;
-      baseCtor.call(this, name);
+      baseCtor.call(this, name);//calls the bacse ctor
     }
-    this.draw = function() {
+    this.draw = function() {//redefines the draw function
       console.log("square with length " + this.length);
-      base.draw.call(this);
+      base.draw.call(this);//calls the base class' draw function
     }
 })
 ```
 
-### `.inheritWith` flavour:
+#### `.inheritWith` flavour
 
 To define the `derrived class` Square:
 ```javascript
@@ -71,11 +71,11 @@ var Square = Figure.inheritWith(function(base, baseCtor) {
     return { 
         constructor:  function(name, length) { 
             this.length = length;
-            baseCtor.call(this, name);
+            baseCtor.call(this, name);//calls the bacse ctor
         },
-        draw: function() {
+        draw: function() {//redefines the draw function
             console.log("square with length " + this.length);
-            base.draw.call(this);
+            base.draw.call(this);//calls the base class' draw function
         }
     }
 })
