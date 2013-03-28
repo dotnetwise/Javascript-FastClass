@@ -117,7 +117,7 @@ function Animal() {
     this.privileged1 = function(){}
     this.privileged2 = function(){}
 }.define({ 
-    // Public - on prottype
+    // Public - on prototype
     method1: function(){}
 });
 ```
