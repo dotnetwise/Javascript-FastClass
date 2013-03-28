@@ -99,6 +99,80 @@ figure.draw();
 //figure 10cm square
 ```
 
+## A clasical example
+### Usage
+
+`[[constructor]].extend( function )`
+
+#### Example
+
+```javascript
+// Animal base class
+function Animal() {
+    // Private
+    function private1(){}
+    function private2(){}
+
+    // Privileged - on instance
+    this.privileged1 = function(){}
+    this.privileged2 = function(){}
+}.define({ 
+    // Public - on prottype
+    method1: function(){}
+});
+```
+
+The `function Animal` method acts as the constructor, which is invoked when an instance is created:
+
+```javascript
+var animal = new Animal(); // Create a new Animal instance
+```
+
+### Inheritance
+
+```javascript
+// Extend the Animal class with inheritWith flavor
+var Dog = Animal.inheritWith(function(base, baseCtor) {
+    return {
+        // Override base class `method1`
+        method1: function(){
+            console.log('dog::method1');
+        },
+        scare: function(){
+            console.log('Dog::I scare you');
+        }
+    }
+});
+```
+
+Create an instance of `Dog`:
+
+```javascript
+var husky = new Dog();
+husky.scare(); // "Dog::I scare you'"
+```
+
+#### Accessing parent prototype
+
+Every class definition has access to the parent's prototype via the first argument passed into the function. The second argument is the base Class itself (constructor):
+
+```javascript
+// Same as above but Extend the Animal class using fastClass flavor
+var Dog = Animal.fastClass(function(base, baseCtor) {
+    return function() {
+        //the cosntructor will be automatically added for us
+        // Override base class `method1`
+        this.method1 = function(){
+            // Call the parent method
+            base.method1.call(this);
+        };
+        this.scare = function(){
+            console.log('Dog::I scare you');
+        }
+    }
+});
+```
+
 ### Some gems
 Although it could hurt `hard-core performance` in real live it doesn't feel much of a difference betweeen `.innerWith` and `.fastClass` upon same browser. 
 Between different browsers is a whole different story.
