@@ -109,7 +109,7 @@ var A = function(name) {
 }) 
 ```
 
-The `define` function sets all the members of the provided object to the `function.prorortpe` **(`A.prototype` that is)** and returns it **(`A` that is)**
+The `define` function sets all the members of the provided object to the `function.prorortpe` *(`A.prototype` that is)* and returns it *(`A` that is)*
 
 
 ## Where?
