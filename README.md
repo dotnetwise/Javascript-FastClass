@@ -9,19 +9,19 @@ A faster and easier Javascript Inheritance
 <img src="../../wiki/images/NugetIcon.png" />
 </div>
 
-## Why?
+## Why yet another library?
 Native Javascript Inheritance is a pin in the ass. Even if you understand it perfectly it still requires some hideous repetivie code.
 
 There are a lot of libraries which aims to help you with such that, but the main question is:
 
 What is <a href="http://jsperf.com/js-inheritance-performance/25" target="_blank"><code>the fastest</code></a> vs <a target="_blank" href="https://github.com/njoubert/inheritance.js/blob/master/INHERITANCE.md"><code>most convenient</code></a> to create <a href="http://msdn.microsoft.com/en-us/magazine/ff852808.aspx" target="_blank"><code>Prototypal Inheritance</code></a> with?
 
-## When?
+## When to use it?
 You do need this library when you can't use a language that <a href="https://github.com/jashkenas/coffee-script/wiki/List-of-languages-that-compile-to-JS" target="_blank"><code>compiles</code></a> into javascript.
 
 e.g. <a href="https://developers.google.com/closure/" target="_blank">Google Closure</a>, <a href="http://www.typescriptlang.org/Playground/" target="_blank">TypeScript</a>, <a href="http://arcturo.github.com/library/coffeescript/03_classes.html" target="_blank">Coffee Script</a> etc.
 
-## What?
+## What is it? 
 FastClass is a very tiny library (<0.5KB minified and gzipped) that helps you quickly derrive your `classes` so to speak. 
 It comes in two flavours:
 * [`Function.prototype.fastClass(creator)`](#fastclass-flavour) - fastest, does not iterate the members when creates the derrived function
@@ -35,7 +35,7 @@ function(base, baseCtor) { return { somePrototypeMethod1: ..., somePrototypeMeth
 ```
 whereas `baseCtor` is the function we want to inherit and base is it's prototype *(`baseCtor.prototype` that is).*
 
-## How?
+## How to use it?
 
 The `base class`:
 ```javascript
@@ -85,7 +85,7 @@ As you can see in both cases the definition is pretty simple and very similar.
 
 However the `.inheritWith` flavour comes with about 15-25% <a href="http://jsperf.com/js-inheritance-performance/25" target="_blank"><code>performance cost</code></a> depending on the actual browser and number of members.
 
-### Usage
+#### Usage
 
 Whichever flavour you have chosen the usage code is the same. Firstly you need to instantiate the constructors with the `new` operator:
 ```javascript
