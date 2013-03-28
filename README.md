@@ -3,9 +3,9 @@ Javascript-fastClass
 A faster and easier Javascript Inheritance 
 
 
-*  <a href="http://jsperf.com/js-inheritance-performance/25" target="_blank"><code>Performance tests</code></a>
-*  <a href="http://jsperf.com/js-inheritance-performance/26" target="_blank"><code>Performance tests among fastest only</code></a>
-*  <a href="http://jsperf.com/js-inheritance-performance/30" target="_blank">A more 'real wolrd' <code>performance test<code> where we define 3 constructors and create 500 objects of each<code>
+*  <a href="http://jsperf.com/js-inheritance-performance/25" target="_blank"><code>Performance tests</code></a> - 3 classes * 100 instances each
+*  <a href="http://jsperf.com/js-inheritance-performance/26" target="_blank"><code>Performance tests among fastest only</code></a> - 3 classes * 100 instances each
+*  A more 'real wolrd' <a href="http://jsperf.com/js-inheritance-performance/30" target="_blank"><code>performance test</code></a> - 3 classes * 500 instances each
 
 <div align="center">
 <img src="../../wiki/images/NugetIcon.png"/>
