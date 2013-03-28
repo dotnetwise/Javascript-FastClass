@@ -1,12 +1,13 @@
 Javascript-FastClass
 ====================
-|:---------------------------------------:||
-| ![AAA](../../wiki/images/NugetIcon.png) ||
-
 Fast Javascript Inheritance 
 
 *  <a href="http://jsperf.com/js-inheritance-performance/25" target="_blank"><code>Performance Tests</code></a>
 *  <a href="http://jsperf.com/js-inheritance-performance/26" target="_blank"><code>Performance Tests among fastest only</code></a>
+
+<div align="center">
+<img src="../../wiki/images/NugetIcon.png" />
+</div>
 
 ## Why?
 Native Javascript Inheritance is a pin in the ass. Even if you understand it perfectly it still requires some hideous repetivie code.
