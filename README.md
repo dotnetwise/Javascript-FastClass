@@ -1,7 +1,7 @@
 Javascript-FastClass
 ====================
-|:---------------------------------------:|
-| ![AAA](../../wiki/images/NugetIcon.png) |
+|:---------------------------------------:||
+| ![AAA](../../wiki/images/NugetIcon.png) ||
 
 Fast Javascript Inheritance 
 
