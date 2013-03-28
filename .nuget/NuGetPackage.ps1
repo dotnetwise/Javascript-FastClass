@@ -232,8 +232,8 @@ function Publish {
     $nugetConfig.configuration.packageSources.add | ForEach-Object {
         $url = $_.value
 
-        Write-Log "Repository Url: $url"
         Write-Log " "
+        Write-Log "Repository Url: $url"
 
         Get-ChildItem bin\*.nupkg | Sort-Object name -descending | Where-Object { $_.Name.EndsWith(".symbols.nupkg") -eq $false } | ForEach-Object { 
 
