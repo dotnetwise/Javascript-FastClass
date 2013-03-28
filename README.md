@@ -102,7 +102,7 @@ figure.draw();
 ## A clasical example
 ### Usage
 
-`[[constructor]].extend( function )`
+`[[constructor]].fastClass( function )` - that function is called `creator` of the inherited prototype
 
 #### Example
 
