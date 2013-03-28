@@ -122,3 +122,5 @@ Install-Package Javascript-FastClass
 
 ## What's next?
 Do you have a better & faster way? Share it! We would love to seeing creativity in action!
+
+[![githalytics.com alpha](https://cruel-carlota.pagodabox.com/ced79a6263a52ce6aed7515d0cd0b0f3 "githalytics.com")](http://githalytics.com/dotnetwise/Javascript-FastClass)
