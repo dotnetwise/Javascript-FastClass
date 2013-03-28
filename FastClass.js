@@ -22,6 +22,45 @@ Function.prototype.fastClass = function (creator) {
 	return derrivedProrotype.constructor;
 };
 
+Function.prototype.inheritWith = function (creator, makeConstructorNotEnumerable) {
+	/// <summary>Extends the prototype of the given function with the custom methods and fields specified in the prototype parameter.</summary>
+	/// <param name="prototype" type="Plain Object">A custom object with the methods or properties to be added on Extendee.prototype</param>
+	var baseCtor = this;
+	var creatorResult = creator.call(this, this.prototype, this) || {};
+	var Derrived = creatorResult.constructor ||
+	function defaultCtor() {
+		baseCtor.apply(this, arguments);
+	}; //automatic constructor if ommited
+	var derrivedPrototype;
+	__.prototype = this.prototype;
+	Derrived.prototype = derrivedPrototype = new __;
+
+	for (var p in creatorResult)
+		derrivedPrototype[p] = creatorResult[p];
+
+	//By default we set the constructor but we don't make it non-enumerable
+	//if we care about Derrived.prototype.constructor === Derrived to be non-Enumerable we need to use Object.defineProperty
+	if (makeConstructorNotEnumerable && canDefineNonEnumerableProperty) //this is not default as it carries over some performance overhead
+		Object.defineProperty(derrivedPrototype, 'constructor', {
+			enumerable: false,
+			value: Derrived
+		});
+
+	return Derrived;
+};
+
+Function.prototype.define = function (prototype) {
+	/// <summary>Define members on the prototype of the given function with the custom methods and fields specified in the prototype parameter.</summary>
+	/// <param name="prototype" type="Plain Object">A custom object with the methods or properties to be added on Extendee.prototype</param>
+
+	var extendeePrototype = this.prototype;
+
+	if (prototype)
+		for (var p in prototype)
+			extendeePrototype[p] = prototype[p];
+	return this;
+}
+
 ///// Example usage:
 
 //var A = function (val) {
