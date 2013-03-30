@@ -22,9 +22,29 @@ Function.prototype.fastClass = function (creator) {
 	return derrivedProrotype.constructor;
 };
 
+Function.fastClass = function (creator, makeConstructorNotEnumerable) {
+	/// <summary>Defines a function named constructor returned by the creator parameter and extends it's protoype with all other functions</summary>
+	/// <param name="creator" type="function() { return { constructor: function() {..}...} }"></param>
+	var creatorResult = creator.call(this) || {};
+	var constructor = creatorResult.constructor || function () { }; //automatic constructor if ommited
+	var prototype = constructor.prototype;
+	for (var p in creatorResult)
+		prototype[p] = creatorResult[p];
+
+	//By default we set the constructor but we don't make it non-enumerable
+	//if we care about constructor.prototype.constructor === constructor to be non-Enumerable we need to use Object.defineProperty
+	if (makeConstructorNotEnumerable && canDefineNonEnumerableProperty) //this is not default as it carries over some performance overhead
+		Object.defineProperty(prototype, 'constructor', {
+			enumerable: false,
+			value: Derrived
+		});
+
+	return constructor;
+};
+
 Function.prototype.inheritWith = function (creator, makeConstructorNotEnumerable) {
-	/// <summary>Extends the prototype of the given function with the custom methods and fields specified in the prototype parameter.</summary>
-	/// <param name="prototype" type="Plain Object">A custom object with the methods or properties to be added on Extendee.prototype</param>
+	/// <summary>Inherits the function's prototype to a new function named constructor returned by the creator parameter</summary>
+	/// <param name="creator" type="function(base, baseCtor) { return { constructor: function() {..}...} }">where base is BaseClass.prototype and baseCtor is BaseClass - aka the function you are calling .inheritWith on</param>
 	var baseCtor = this;
 	var creatorResult = creator.call(this, this.prototype, this) || {};
 	var Derrived = creatorResult.constructor ||
@@ -32,6 +52,7 @@ Function.prototype.inheritWith = function (creator, makeConstructorNotEnumerable
 		baseCtor.apply(this, arguments);
 	}; //automatic constructor if ommited
 	var derrivedPrototype;
+	function __() { };
 	__.prototype = this.prototype;
 	Derrived.prototype = derrivedPrototype = new __;
 
@@ -48,6 +69,7 @@ Function.prototype.inheritWith = function (creator, makeConstructorNotEnumerable
 
 	return Derrived;
 };
+
 
 Function.prototype.define = function (prototype) {
 	/// <summary>Define members on the prototype of the given function with the custom methods and fields specified in the prototype parameter.</summary>
