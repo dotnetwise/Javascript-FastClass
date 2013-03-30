@@ -120,6 +120,23 @@ function Animal() {
 });
 ```
 
+Alternatively the above can be defined as:
+```javascript
+var Animal = Function.fastClass(function(){
+    // Private 
+    function private1() {}
+    function private2() {}
+    return {
+        constructor: function() {
+            // Privileged - on instance
+            this.privileged1 = function(){}
+            this.privileged2 = function(){}
+        },
+        method1: function() {}
+    };
+});
+```
+
 The `function Animal` method acts as the constructor, which is invoked when an instance is created:
 
 ```javascript
