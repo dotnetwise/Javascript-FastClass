@@ -11,7 +11,19 @@
 	});
 	intellisense.addEventListener('statementcompletion', function (e) {
 		e.items.forEach(function (item) {
-
+			if (item.name == "a") {
+				intellisense.logMessage("before:" + JSON.stringify(item));
+				item.kind = "method";
+				item["_$group"] = 0xff;
+				item.Group = 0xff;
+				item.glyph = "vs:GlyphGroupValueType";
+				//item.scope = "member";
+				//item.comments = "abc";
+				//delete item["_$fileId"];
+				//delete item["_$pos"];
+				intellisense.logMessage("after:" + JSON.stringify(item));
+				return;
+			}
 			var value = item.value,
 				parentObject = item.parentObject,
 				kind = item.kind;
@@ -27,33 +39,6 @@
 			} else if (value instanceof RegExp) {
 				item.kind = "field";
 				item.glyph = 'vs:GlyphAssembly';
-			} 
-			else if (item.name === "constructor" || item.name[0].toUpperCase() == item.name[0] && item.name !== "Math") {
-				item.glyph = 'vs:GlyphGroupClass';
-				item.kind = "method";
-			}
-			else if (item.name === "prototype" || parentObject && item.value == parentObject.prototype && parentObject.prototype) {
-				item.glyph = 'vs:GlyphGroupModule';
-			}
-			else if (parentObject && !parentObject.hasOwnProperty(item.name) && item.value === Object.prototype[item.name]) {
-
-				item.kind = "field";
-				//intellisense.logMessage("On Object prototype: " + item.name + ": " + parentObject.hasOwnProperty(item.name).toString() + typeof value);
-				if (typeof value === "function") {
-					item.glyph = "vs:GlyphReference";
-					item.kind = "method";
-				}
-				else item.glyph = "vs:GlyphGroupTypedef";
-			}
-			else if (parentObject && !parentObject.hasOwnProperty(item.name)) {
-
-				item.kind = "field";
-				//intellisense.logMessage("On prototype: " + item.name + ": " + parentObject.hasOwnProperty(item.name).toString() + typeof value);
-				if (typeof value === "function") {
-					item.kind = "method";
-					item.glyph = "vs:GlyphExtensionMethod";
-				}
-				else item.glyph = "vs:GlyphGroupTypedef";
 			}
 			else if (value && (value._isNamespace || value.__namespace)) {
 				item.kind = "field";
@@ -101,6 +86,36 @@
 				item.kind = "field";
 				item.glyph = 'vs:GlyphXmlNamespace';
 			}
+			else if (item.name === "constructor" && typeof item.value === "function" || item.name[0].toUpperCase() == item.name[0] && item.name !== "Math") {
+				item.glyph = 'vs:GlyphGroupClass';
+				item.kind = "method";
+			}
+			else if (item.__module || item._isModule || item.name === "prototype" || parentObject && item.value == parentObject.prototype && parentObject.prototype) {
+				item.glyph = 'vs:GlyphGroupModule';
+			}
+			else if (parentObject && !parentObject.hasOwnProperty(item.name) && item.value === Object.prototype[item.name]) {
+
+				item.kind = "field";
+				//intellisense.logMessage("On Object prototype: " + item.name + ": " + parentObject.hasOwnProperty(item.name).toString() + typeof value);
+				if (typeof value === "function") {
+					item.glyph = "vs:GlyphReference";
+					item.kind = "method";
+				}
+				else item.glyph = "vs:GlyphGroupTypedef";
+			}
+			else if (parentObject && !parentObject.hasOwnProperty(item.name)) {
+
+				item.kind = "field";
+				//intellisense.logMessage((item.value === Object.getPrototypeOf(parentObject)[item.name]).toString()+" -- On prototype: " + item.name + ": " + parentObject.hasOwnProperty(item.name).toString() + typeof value);
+				if (typeof value === "function") {
+					item.kind = "method";
+					var __proto__ = Object.getPrototypeOf(parentObject);
+					if (item.value === __proto__[item.name] && __proto__.hasOwnProperty(item.name))
+						item.glyph = "vs:GlyphGroupDelegate";
+					else item.glyph = "vs:GlyphExtensionMethod";
+				}
+				else item.glyph = "vs:GlyphGroupTypedef";
+			}
 			else if (typeof value === "function") {
 				item.kind = "method";
 				item.glyph = 'vs:GlyphGroupMethod';
@@ -110,7 +125,9 @@
 			} else if (typeof value === "undefined") {
 				if (!reservedKeywords[item.name]) {
 					if (!parentObject)
-						if (item.name === "true" || item.name === "false")
+						if (item.name === "null")
+							item.glyph = "vs:GlyphJSharpDocument";
+						else if (item.name === "true" || item.name === "false")
 							item.glyph = "vs:GlyphGroupUnion";
 						else item.glyph = 'vs:GlyphMaybeReference';
 					else item.glyph = 'vs:GlyphMaybeReference';
@@ -134,7 +151,7 @@
 			var parentObject = item.parentObject;
 			var hidden = parentObject
 				? (parentObject.__enum || parentObject._isEnum)
-					? item.kind != "field" 
+					? item.kind != "field"
 					: false
 				: false;
 			if (parentObject && (parentObject.__namespace || parentObject._isNamespace)) {

@@ -158,187 +158,187 @@
 
 })();
 
-////Uncomment this for a quick demo & self test
-//////////////////OPTION 1: extend////////////////////////
-//Using prototype:
+//////Uncomment this for a quick demo & self test
+////////////////////OPTION 1: extend////////////////////////
+////Using prototype:
 
-var A = function (val) {
-	if (val) {
-		this.val = val;
-	}
-}
-A.prototype.method1 = function (x, y, z) {
-	this.x = x;
-	this.y = y;
-	this.z = z;
-}
+//var A = function (val) {
+//	if (val) {
+//		this.val = val;
+//	}
+//}
+//A.prototype.method1 = function (x, y, z) {
+//	this.x = x;
+//	this.y = y;
+//	this.z = z;
+//}
 
-//Follow derrivations using extend
-var B = A.extend(function (base, baseCtor) {
-	return function B(val) {
-		baseCtor.apply(this, arguments);
-	}.override(base, {
-		method1: function (y, z) {
-			base.method1.call(this, 'x', y, z);
-		}
-	});
-});
+////Follow derrivations using extend
+//var B = A.extend(function (base, baseCtor) {
+//	return function B(val) {
+//		baseCtor.apply(this, arguments);
+//	}.override(base, {
+//		method1: function (y, z) {
+//			base.method1.call(this, 'x', y, z);
+//		}
+//	});
+//});
 
-var C = B.extend(function (base, baseCtor) {
-	return function C(val) {
-		baseCtor.apply(this, arguments);
-	}.override(base, {
-		method1: function (z) {
-			base.method1.call(this, 'y', z);
-		}
-	});
-});
+//var C = B.extend(function (base, baseCtor) {
+//	return function C(val) {
+//		baseCtor.apply(this, arguments);
+//	}.override(base, {
+//		method1: function (z) {
+//			base.method1.call(this, 'y', z);
+//		}
+//	});
+//});
 
-var D = C.extend(function (base, baseCtor) {
-	return function D(val) {
-		baseCtor.apply(this, arguments);
-	}.override(base, {
-		method1: function (z) {
-			base.method1.call(this, z);
-		}
-	});
-});
+//var D = C.extend(function (base, baseCtor) {
+//	return function D(val) {
+//		baseCtor.apply(this, arguments);
+//	}.override(base, {
+//		method1: function (z) {
+//			base.method1.call(this, z);
+//		}
+//	});
+//});
 
-selfTest();
+//selfTest();
 
-//////////////////OPTION 2: inheritWith////////////////////////
-//Using Define: 
-//function.define(proto) copies the given value from proto to function.prototype
+////////////////////OPTION 2: inheritWith////////////////////////
+////Using Define: 
+////function.define(proto) copies the given value from proto to function.prototype
 
-var A = function (val) {
-	if (val) {
-		this.val = val;
-	}
-}.define({
-	method1: function (x, y, z) {
-		this.x = x;
-		this.y = y;
-		this.z = z;
-	}
-});
+//var A = function (val) {
+//	if (val) {
+//		this.val = val;
+//	}
+//}.define({
+//	method1: function (x, y, z) {
+//		this.x = x;
+//		this.y = y;
+//		this.z = z;
+//	}
+//});
 
-//Follow derrivations using inheritWith
+////Follow derrivations using inheritWith
 
-var B = A.inheritWith(function (base, baseCtor) {
-	return {
-		constructor: function (val) { baseCtor.call(this, val) },
-		method1: function (y, z) {
-			base.method1.call(this, 'x', 'y', z);
-		}
-	};
-});
+//var B = A.inheritWith(function (base, baseCtor) {
+//	return {
+//		constructor: function (val) { baseCtor.call(this, val) },
+//		method1: function (y, z) {
+//			base.method1.call(this, 'x', 'y', z);
+//		}
+//	};
+//});
 
-var C = B.inheritWith(function (base, baseCtor) {
-	return {
-		constructor: function (val) { baseCtor.call(this, val) },
-		method1: function (z) {
-			base.method1.call(this, 'y', z);
-		}
-	};
-});
+//var C = B.inheritWith(function (base, baseCtor) {
+//	return {
+//		constructor: function (val) { baseCtor.call(this, val) },
+//		method1: function (z) {
+//			base.method1.call(this, 'y', z);
+//		}
+//	};
+//});
 
-var D = C.inheritWith(function (base, baseCtor) {
-	return {
-		constructor: function (val) { baseCtor.call(this, val) },
-		method1: function (z) {
-			base.method1.call(this, z);
-		}
-	};
-});
-
-
-selfTest();
-
-//////////////////OPTION 3: fastClass////////////////////////
-//Using Define:
-
-var A = function (val) {
-	if (val) {
-		this.val = val;
-	}
-}.define({
-	method1: function (x, y, z) {
-		this.x = x;
-		this.y = y;
-		this.z = z;
-	}
-});
+//var D = C.inheritWith(function (base, baseCtor) {
+//	return {
+//		constructor: function (val) { baseCtor.call(this, val) },
+//		method1: function (z) {
+//			base.method1.call(this, z);
+//		}
+//	};
+//});
 
 
-//Follow derrivations using fastClass
-var B = A.fastClass(function (base, baseCtor) {
-	this.constructor = function (val) { baseCtor.call(this, val) };
-	this.method1 = function (y, z) {
-		base.method1.call(this, 'x', y, z);
-	}
-});
-var C = B.fastClass(function (base, baseCtor) {
-	this.constructor = function (val) { baseCtor.call(this, val) };
-	this.method1 = function (z) {
-		base.method1.call(this, 'y', z);
-	};
-});
+//selfTest();
 
-var D = C.fastClass(function (base, baseCtor) {
-	this.constructor = function (val) { baseCtor.call(this, val) };
-	this.method1 = function (z) {
-		base.method1.call(this, z);
-	};
-});
+////////////////////OPTION 3: fastClass////////////////////////
+////Using Define:
 
-selfTest();
+//var A = function (val) {
+//	if (val) {
+//		this.val = val;
+//	}
+//}.define({
+//	method1: function (x, y, z) {
+//		this.x = x;
+//		this.y = y;
+//		this.z = z;
+//	}
+//});
 
-function selfTest() {
-	window.a = new A("a");
-	a.method1("x", "y", "z");
-	console.assert(a.x == "x", "a.x should be set to 'x'");
-	console.assert(a.y == "y", "a.y should be set to 'y'");
-	console.assert(a.z == "z", "a.z should be set to 'z'");
-	window.b = new B("b");
-	b.method1("y", "z");
-	console.assert(b.x == "x", "b.x should be set to 'x'");
-	console.assert(b.y == "y", "b.y should be set to 'y'");
-	console.assert(b.z == "z", "b.z should be set to 'z'");
-	window.c = new C("c");
-	c.method1("z");
-	console.assert(c.x == "x", "c.x should be set to 'x'");
-	console.assert(c.y == "y", "c.y should be set to 'y'");
-	console.assert(c.z == "z", "c.z should be set to 'z'");
 
-	window.d = new D("d");
-	d.method1("w");
-	console.assert(d.x == "x", "d.x should be set to 'x'");
-	console.assert(d.y == "y", "d.y should be set to 'y'");
-	console.assert(d.z == "w", "d.z should be set to 'w'");
+////Follow derrivations using fastClass
+//var B = A.fastClass(function (base, baseCtor) {
+//	this.constructor = function (val) { baseCtor.call(this, val) };
+//	this.method1 = function (y, z) {
+//		base.method1.call(this, 'x', y, z);
+//	}
+//});
+//var C = B.fastClass(function (base, baseCtor) {
+//	this.constructor = function (val) { baseCtor.call(this, val) };
+//	this.method1 = function (z) {
+//		base.method1.call(this, 'y', z);
+//	};
+//});
 
-	var expecteds = {
-		"d instanceof A": true,
-		"d instanceof B": true,
-		"d instanceof C": true,
-		"d instanceof D": true,
-		"c instanceof A": true,
-		"c instanceof B": true,
-		"c instanceof C": true,
-		"b instanceof A": true,
-		"b instanceof B": true,
-		"b instanceof C": false,
-		"a instanceof A": true,
-		"a instanceof B": false,
-		"a instanceof C": false,
-		"A.prototype.constructor === a.constructor && a.constructor === A": true,
-		"B.prototype.constructor === b.constructor && b.constructor === B": true,
-		"C.prototype.constructor === c.constructor && c.constructor === C": true,
-		"D.prototype.constructor === d.constructor && d.constructor === D": true,
-	}
-	for (var expectedKey in expecteds) {
-		var expected = expecteds[expectedKey];
-		var actual = eval(expectedKey);//using eval for quick demo self test purposing -- using eval is not recommended otherwise
-		console.assert(!(expected ^ actual), expectedKey + " expected: " + expected + ", actual: " + actual);
-	}
-}
-console.log("If there are no asserts in the console then all tests have passed! yey :)")
+//var D = C.fastClass(function (base, baseCtor) {
+//	this.constructor = function (val) { baseCtor.call(this, val) };
+//	this.method1 = function (z) {
+//		base.method1.call(this, z);
+//	};
+//});
+
+//selfTest();
+
+//function selfTest() {
+//	window.a = new A("a");
+//	a.method1("x", "y", "z");
+//	console.assert(a.x == "x", "a.x should be set to 'x'");
+//	console.assert(a.y == "y", "a.y should be set to 'y'");
+//	console.assert(a.z == "z", "a.z should be set to 'z'");
+//	window.b = new B("b");
+//	b.method1("y", "z");
+//	console.assert(b.x == "x", "b.x should be set to 'x'");
+//	console.assert(b.y == "y", "b.y should be set to 'y'");
+//	console.assert(b.z == "z", "b.z should be set to 'z'");
+//	window.c = new C("c");
+//	c.method1("z");
+//	console.assert(c.x == "x", "c.x should be set to 'x'");
+//	console.assert(c.y == "y", "c.y should be set to 'y'");
+//	console.assert(c.z == "z", "c.z should be set to 'z'");
+
+//	window.d = new D("d");
+//	d.method1("w");
+//	console.assert(d.x == "x", "d.x should be set to 'x'");
+//	console.assert(d.y == "y", "d.y should be set to 'y'");
+//	console.assert(d.z == "w", "d.z should be set to 'w'");
+
+//	var expecteds = {
+//		"d instanceof A": true,
+//		"d instanceof B": true,
+//		"d instanceof C": true,
+//		"d instanceof D": true,
+//		"c instanceof A": true,
+//		"c instanceof B": true,
+//		"c instanceof C": true,
+//		"b instanceof A": true,
+//		"b instanceof B": true,
+//		"b instanceof C": false,
+//		"a instanceof A": true,
+//		"a instanceof B": false,
+//		"a instanceof C": false,
+//		"A.prototype.constructor === a.constructor && a.constructor === A": true,
+//		"B.prototype.constructor === b.constructor && b.constructor === B": true,
+//		"C.prototype.constructor === c.constructor && c.constructor === C": true,
+//		"D.prototype.constructor === d.constructor && d.constructor === D": true,
+//	}
+//	for (var expectedKey in expecteds) {
+//		var expected = expecteds[expectedKey];
+//		var actual = eval(expectedKey);//using eval for quick demo self test purposing -- using eval is not recommended otherwise
+//		console.assert(!(expected ^ actual), expectedKey + " expected: " + expected + ", actual: " + actual);
+//	}
+//}
+//console.log("If there are no asserts in the console then all tests have passed! yey :)")
