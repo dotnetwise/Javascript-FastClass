@@ -25,16 +25,17 @@ You do need this library when you can't use a language that <a href="https://git
 e.g. <a href="https://developers.google.com/closure/" target="_blank">Google Closure</a>, <a href="http://www.typescriptlang.org/Playground/" target="_blank">TypeScript</a>, <a href="http://arcturo.github.com/library/coffeescript/03_classes.html" target="_blank">Coffee Script</a> etc.
 
 ## What is it? 
-FastClass is a very tiny library (<0.5KB minified and gzipped) that helps you quickly derrive your `classes` so to speak. 
+FastClass is a very tiny library (~0.6KB minified and gzipped) that helps you quickly derrive your `classes` so to speak. 
 It comes in two flavours:
-* [`Function.prototype.fastClass(creator)`](#fastclass-flavour) - fastest, does not iterate the members when creates the derrived function
+* [`Function.prototype.fastClass(creator)`](#fastclass-flavour) - sets the `Base.prototype` to the `creator` function
 ```javascript
 function(base, baseCtor) { this.somePrototypeMethod1 =  ...; this.somePrototypeMethod2 =  ...; } }
 ```
 
-* [`Function.prototype.inheritWith(creator)`](#inheritwith-flavour) - recommended
-It makes usage of __proto__ on all new browsers (which makes it blazing fast) except `Internet Explorer` and maybe other ancient browser where it fallbacks to `for (var key in obj)` statement.
-__proto__ will become standard in ECMAScript 6
+* [`Function.prototype.inheritWith(creator)`](#inheritwith-flavour) - **recommended**. 
+
+It makes usage of __proto__ on all new browsers (which makes it blazing fast) except `Internet Explorer` and maybe other ancient browsers where it fallbacks to `for (var key in obj)` statement.
+### Note `__proto__` will become standard in <a href="http://javascript.spec.whatwg.org/#object.prototype.__proto__" target="_blank">ECMAScript 6</a>
 ```javascript
 function(base, baseCtor) { return { somePrototypeMethod1: ..., somePrototypeMethod2: ...} }
 ```
