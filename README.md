@@ -35,6 +35,7 @@ function(base, baseCtor) { this.somePrototypeMethod1 =  ...; this.somePrototypeM
 * [`Function.prototype.inheritWith(creator)`](#inheritwith-flavour) - **recommended**. 
 
 It makes usage of __proto__ on all new browsers (which makes it blazing fast) except `Internet Explorer` and maybe other ancient browsers where it fallbacks to `for (var key in obj)` statement.
+
 Note `__proto__` will become standard in <a href="http://javascript.spec.whatwg.org/#object.prototype.__proto__" target="_blank">ECMAScript 6</a>
 ```javascript
 function(base, baseCtor) { return { somePrototypeMethod1: ..., somePrototypeMethod2: ...} }
