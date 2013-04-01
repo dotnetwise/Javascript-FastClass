@@ -90,8 +90,12 @@ var Square = Figure.inheritWith(function(base, baseCtor) {
 
 As you can see in both cases the definition is pretty simple and very similar. 
 
-However the `.inheritWith` flavour comes with about 3-15% <a href="http://jsperf.com/js-inheritance-performance/34" target="_blank"><code>performance boost</code></a> depending on the actual browser and number of members.
+However the `.inheritWith` flavour comes with about 5-15% <a href="http://jsperf.com/js-inheritance-performance/34" target="_blank"><code>performance boost</code></a> depending on the actual browser and number of members.
 That is because we are simply setting `__proto__` with the BaseClass.prototype for those browsers who support it (all nowdays browsers except `IE<=10`)
+
+In both cases we the `constructor` is the function that is returned as the `derrived class' constructor`. 
+
+The `constructor` is optional and we should only add it when we have some custom code as both functions will add it for us otherswise.
 
 #### Usage
 
