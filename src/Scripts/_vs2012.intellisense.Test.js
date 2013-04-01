@@ -56,4 +56,14 @@
 	//Class.
 	//c.
 
+
+	//call and apply correct description and parameter hints!!
+	function method(name, options) {
+		/// <summary>Does that</summary>
+		/// <param name="name" type="String">The name of the method</param>
+		/// <param name="options" type="Object" optional="true">Extra options for this method</param>
+	}
+	method("abc")
+	method.call(this, "abc")
+	method.apply(this, ["abc"])
 }();

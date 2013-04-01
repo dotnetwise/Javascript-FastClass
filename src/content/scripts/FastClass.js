@@ -1,77 +1,55 @@
 ﻿////For performance tests please see: http://jsperf.com/js-inheritance-performance/25
+/// <reference path="../../scripts/_vs2012.intellisense.js" />
 
 
 (function () {
-	var canDefineNonEnumerableProperty = typeof Object.defineProperty === "function";
-	function __() { };
-	Function.prototype.inherit = function (creator, makeConstructorNotEnumerable) {
-		/// <summary>Inherits the prototype of the given function. The creator function should return a new Constructor function whose prototype will share this functions's prototype</summary>
-		/// <param name="creator" type="Function">function(base, baseConstructor) {<br/>
-		///  return function Derived() {  <br/>
-		///  		base.apply(this, arguments); <br/>
-		///  	} <br/>
-		///  	Notice that there is no .override method call after the function Derrived(){}. This is very important. If you do want to override some methods then use .extend instead
-		///  </param>
-		/// <param name="makeConstructorNotEnumerable" type="Boolean">Object.defineProperty is rather slow. If you concern about performance and don't care about 'constructor' being enumerable in for (var i in instance) then let this false. <br/>
-		/// Otherwise set it to true and we will redefine the correct constructor i.e. Extendee.prototype.constructor === Extendee that is non-Enumerable
-		/// </param>
-
-		__.prototype = this.prototype;
-		var Derived = creator.call(this, this.prototype, this);
-		Derived.prototype = new __;
-		this.__class = Derived.__class = 1;
-
-		//if we care about Extendee.prototype.constructor === Extendee to be non-Enumerable
-		//By default we set the constructor but we don't make it non-enumerable
-		if (makeConstructorNotEnumerable && canDefineNonEnumerableProperty)//this is not default as it carries over some performance overhead
-			Object.defineProperty(extendeePrototype, 'constructor', { enumerable: false, value: Derived });
-		else Derived.prototype.constructor = Derived;//Also fallback for older non-ECMA-5 browsers
-
-		return Derived;
-	};
-	Function.prototype.extend = function (creator) {
-		/// <summary>Extends the prototype of the given function. The creator function should return a new Constructor function whose prototype will share this functions's prototype.</summary>
-		/// <param name="creator" type="Function">function(base, baseConstructor) {<br/>
-		///  return function Derived() {  <br/>
-		///  		base.apply(this, arguments); <br/>
-		///  	}.override(base, {	//custom functions to be added on Derived.prototype <br/>
-		///  	  method: function() { <br/>
-		///		return base.method.apply(this, arguments); //call the base class' method, assuming is any <br/>
-		///      } <br/>
-		///    }); <br/>
-		///    So it is very important to call the .override at the end. If you simply want to inherit from an object with no overrides then you should call .inherit function instead
-		///  </param>
-
-		var Derived = creator.call(this, this.prototype, this);
-
-		this.__class = Derived.__class = 1;
-
-		return Derived;
-	};
-
-	Function.prototype.override = function (basePrototype, prototype, makeConstructorNotEnumerable) {
-		/// <summary>Extends the prototype of the given function with the custom methods and fields specified in the prototype parameter.</summary>
-		/// <param name="prototype" type="Plain Object">A custom object with the methods or properties to be added on Extendee.prototype</param>
-
-
-		__.prototype = basePrototype;
-		var extendeePrototype = new __;
-		this.prototype = extendeePrototype;
-
-		//if we care about Extendee.prototype.constructor === Extendee to be non-Enumerable
-		//By default we set the constructor but we don't make it non-enumerable
-		if (makeConstructorNotEnumerable && canDefineNonEnumerableProperty)//this is not default as it carries over some performance overhead
-			Object.defineProperty(extendeePrototype, 'constructor', { enumerable: false, value: this });
-		else extendeePrototype.constructor = this;
-
-
-		if (prototype)
-			for (var p in prototype)
-				extendeePrototype[p] = prototype[p];
-		return this;
+	var Object_keys = Object.keys;
+	var Object_defineProperty = Object.defineProperty;
+	var Function_prototype = Function.prototype;
+	var canDefineNonEnumerableProperty = typeof Object_defineProperty === "function";
+	var supportsProto = {};
+	supportsProto = supportsProto.__proto__ === Object.prototype;
+	if (supportsProto) {
+		try {
+			supportsProto = {};
+			supportsProto.__proto__ = { Object: 1 };
+			supportsProto = supportsProto.Object === 1;//setting __proto__ in firefox is terribly slow!
+		} catch (ex) { supportsProto = false; }
 	}
+	function __() { };
+	Function_prototype.fastClass = function (creator, makeConstructorNotEnumerable) {
+		/// <summary>Inherits the function's prototype to a new function named constructor returned by the creator parameter</summary>
+		/// <param name="creator" type="function(base, baseCtor) { }">where base is BaseClass.prototype and baseCtor is BaseClass - aka the function you are calling .fastClass on</param>
 
-	Function.prototype.inheritWith = function (creator, makeConstructorNotEnumerable) {
+		//this == constructor of the base "Class"
+		var baseClass = this;
+		var base = this.prototype;
+		creator = creator || function () { this.constructor = function () { baseClass.apply(this, arguments); } };
+		creator.prototype = base;
+
+		//creating the derrived class' prototype
+		var derrivedProrotype = new creator(base, this);
+
+		//did you forget or not intend to add a constructor? We'll add one for you
+		if (!derrivedProrotype.hasOwnProperty("constructor"))
+			derrivedProrotype.constructor = function () { baseClass.apply(this, arguments); }
+
+		//By default we set the constructor but we don't make it non-enumerable
+		//if we care about constructor.prototype.constructor === constructor to be non-Enumerable we need to use Object.defineProperty
+		if (makeConstructorNotEnumerable && canDefineNonEnumerableProperty) //this is not default as it carries over some performance overhead
+			Object_defineProperty(prototype, 'constructor', {
+				enumerable: false,
+				value: Derrived
+			});
+
+		//setting the derrivedPrototype to constructor's prototype
+		derrivedProrotype.constructor.prototype = derrivedProrotype;
+
+		//returning the constructor
+		return derrivedProrotype.constructor;
+	};
+
+	Function_prototype.inheritWith = !supportsProto ? function (creator, makeConstructorNotEnumerable) {
 		/// <summary>Inherits the function's prototype to a new function named constructor returned by the creator parameter</summary>
 		/// <param name="creator" type="function(base, baseCtor) { return { constructor: function() {..}...} }">where base is BaseClass.prototype and baseCtor is BaseClass - aka the function you are calling .inheritWith on</param>
 		var baseCtor = this;
@@ -90,7 +68,29 @@
 		//By default we set the constructor but we don't make it non-enumerable
 		//if we care about Derrived.prototype.constructor === Derrived to be non-Enumerable we need to use Object.defineProperty
 		if (makeConstructorNotEnumerable && canDefineNonEnumerableProperty) //this is not default as it carries over some performance overhead
-			Object.defineProperty(derrivedPrototype, 'constructor', {
+			Object_defineProperty(derrivedPrototype, 'constructor', {
+				enumerable: false,
+				value: Derrived
+			});
+
+		return Derrived;
+	} :// when browser supports __proto__ setting it is way faster than iterating the object
+	function (creator, makeConstructorNotEnumerable) {
+		/// <summary>Inherits the function's prototype to a new function named constructor returned by the creator parameter</summary>
+		/// <param name="creator" type="function(base, baseCtor) { return { constructor: function() {..}...} }">where base is BaseClass.prototype and baseCtor is BaseClass - aka the function you are calling .inheritWith on</param>
+		var baseCtor = this;
+		var derrivedPrototype = creator.call(this, this.prototype, this) || {};
+		var Derrived = derrivedPrototype.constructor ||
+        function defaultCtor() {
+        	baseCtor.apply(this, arguments);
+        }; //automatic constructor if ommited
+		Derrived.prototype = derrivedPrototype;
+		derrivedPrototype.__proto__ = this.prototype;
+
+		//By default we set the constructor but we don't make it non-enumerable
+		//if we care about Derrived.prototype.constructor === Derrived to be non-Enumerable we need to use Object.defineProperty
+		if (makeConstructorNotEnumerable && canDefineNonEnumerableProperty) //this is not default as it carries over some performance overhead
+			Object_defineProperty(derrivedPrototype, 'constructor', {
 				enumerable: false,
 				value: Derrived
 			});
@@ -98,45 +98,22 @@
 		return Derrived;
 	};
 
-	Function.prototype.define = function (prototype) {
+	
+	Function_prototype.define = function (prototype) {
 		/// <summary>Define members on the prototype of the given function with the custom methods and fields specified in the prototype parameter.</summary>
 		/// <param name="prototype" type="Plain Object">A custom object with the methods or properties to be added on Extendee.prototype</param>
 
 		var extendeePrototype = this.prototype;
 
-		if (prototype)
-			for (var p in prototype)
-				extendeePrototype[p] = prototype[p];
+		if (prototype) {
+			for (var key in prototype)
+				extendeePrototype[key] = prototype[key];
+		}
 		return this;
 	}
 
 
-
-	Function.prototype.fastClass = function (creator) {
-		/// <summary>Inherits the function's prototype to a new function named constructor returned by the creator parameter</summary>
-		/// <param name="creator" type="function(base, baseCtor) { }">where base is BaseClass.prototype and baseCtor is BaseClass - aka the function you are calling .fastClass on</param>
-
-		//this == constructof of the base "Class"
-		var baseClass = this;
-		var base = this.prototype;
-		creator = creator || function () { this.constructor = function () { baseClass.apply(this, arguments); } };
-		creator.prototype = base;
-
-		//creating the derrived class' prototype
-		var derrivedProrotype = new creator(base, this);
-
-		//did you forget or not intend to add a constructor? We'll add one for you
-		if (!derrivedProrotype.hasOwnProperty("constructor"))
-			derrivedProrotype.constructor = function () { baseClass.apply(this, arguments); }
-
-		//setting the derrivedPrototype to constructor's prototype
-		derrivedProrotype.constructor.prototype = derrivedProrotype;
-
-		//returning the constructor
-		return derrivedProrotype.constructor;
-	};
-
-	Function.fastClass = function (creator, makeConstructorNotEnumerable) {
+	Function.define = function (creator, makeConstructorNotEnumerable) {
 		/// <summary>Defines a function named constructor returned by the creator parameter and extends it's protoype with all other functions</summary>
 		/// <param name="creator" type="function() { return { constructor: function() {..}...} }"></param>
 		var creatorResult = creator.call(this) || {};
@@ -148,7 +125,7 @@
 		//By default we set the constructor but we don't make it non-enumerable
 		//if we care about constructor.prototype.constructor === constructor to be non-Enumerable we need to use Object.defineProperty
 		if (makeConstructorNotEnumerable && canDefineNonEnumerableProperty) //this is not default as it carries over some performance overhead
-			Object.defineProperty(prototype, 'constructor', {
+			Object_defineProperty(prototype, 'constructor', {
 				enumerable: false,
 				value: Derrived
 			});
@@ -158,62 +135,13 @@
 
 })();
 
-//////Uncomment this for a quick demo & self test
-////////////////////OPTION 1: extend////////////////////////
-////Using prototype:
+////Uncomment this for a quick demo & self test
+//////////////////OPTION 1: inheritWith////////////////////////
+//Using Define: 
+//function.define(proto) copies the given value from proto to Function_prototype
 
 //var A = function (val) {
-//	if (val) {
-//		this.val = val;
-//	}
-//}
-//A.prototype.method1 = function (x, y, z) {
-//	this.x = x;
-//	this.y = y;
-//	this.z = z;
-//}
-
-////Follow derrivations using extend
-//var B = A.extend(function (base, baseCtor) {
-//	return function B(val) {
-//		baseCtor.apply(this, arguments);
-//	}.override(base, {
-//		method1: function (y, z) {
-//			base.method1.call(this, 'x', y, z);
-//		}
-//	});
-//});
-
-//var C = B.extend(function (base, baseCtor) {
-//	return function C(val) {
-//		baseCtor.apply(this, arguments);
-//	}.override(base, {
-//		method1: function (z) {
-//			base.method1.call(this, 'y', z);
-//		}
-//	});
-//});
-
-//var D = C.extend(function (base, baseCtor) {
-//	return function D(val) {
-//		baseCtor.apply(this, arguments);
-//	}.override(base, {
-//		method1: function (z) {
-//			base.method1.call(this, z);
-//		}
-//	});
-//});
-
-//selfTest();
-
-////////////////////OPTION 2: inheritWith////////////////////////
-////Using Define: 
-////function.define(proto) copies the given value from proto to function.prototype
-
-//var A = function (val) {
-//	if (val) {
-//		this.val = val;
-//	}
+//	this.val = val;
 //}.define({
 //	method1: function (x, y, z) {
 //		this.x = x;
@@ -254,13 +182,11 @@
 
 //selfTest();
 
-////////////////////OPTION 3: fastClass////////////////////////
+////////////////////OPTION 2: fastClass////////////////////////
 ////Using Define:
 
 //var A = function (val) {
-//	if (val) {
-//		this.val = val;
-//	}
+//	this.val = val;
 //}.define({
 //	method1: function (x, y, z) {
 //		this.x = x;

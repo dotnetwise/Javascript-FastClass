@@ -1,6 +1,9 @@
 /// <reference path="NamespacesAndEnumSupport.js" />
 
 (function () {
+	//export this so we can 'auto create' classes for triggering VS2012 Intellisense
+	window.vs2012Intellisense = true;
+	//Usage: WAssert(!window.vs2012Intellisense, function() { new Ctor(...) }) - where Ctor is the constructor of the class you want to create. Or you can simply call some functions
 	var reservedKeywords = {};
 	['break', 'case', 'catch', 'continue', 'debugger', 'default', 'delete', 'do', 'else', 'finally',
 	 'for', 'function', 'if', 'in', 'instanceof', 'new', 'return', 'switch', 'this', 'throw', 'try',
@@ -12,7 +15,7 @@
 	intellisense.addEventListener('statementcompletion', function (e) {
 		e.items.forEach(function (item) {
 			if (item.name == "a") {
-				intellisense.logMessage("before:" + JSON.stringify(item));
+				//intellisense.logMessage("before:" + JSON.stringify(item));
 				item.kind = "method";
 				item["_$group"] = 0xff;
 				item.Group = 0xff;
@@ -21,7 +24,7 @@
 				//item.comments = "abc";
 				//delete item["_$fileId"];
 				//delete item["_$pos"];
-				intellisense.logMessage("after:" + JSON.stringify(item));
+				//intellisense.logMessage("after:" + JSON.stringify(item));
 				return;
 			}
 			var value = item.value,
@@ -169,7 +172,7 @@
 				e.symbolHelp.symbolDisplayType = 'Namespace';
 			}
 			if (e.completionvalue._isInterface || e.completionvalue.__interface) {
-				item.value && item.value.__interface && intellisense.logMessage(item.name + " Interface");
+				//item.value && item.value.__interface && intellisense.logMessage(item.name + " Interface");
 				e.symbolHelp.symbolDisplayType = 'Interface';
 			}
 			if (e.completionvalue._isClass || e.completionvalue.__class) {
@@ -261,3 +264,390 @@
 //  vs:GlyphXmlItem					Describes symbols for XML items.
 //  vs:GlyphXmlNamespace				Describes symbols for XML namespaces.
 
+
+
+//call and apply methods 
+(function () {
+	function each(obj, callback, args) {
+		var value, i = 0, length = obj.length, isArray = obj && obj.push == Array.prototype.push;
+		if (args) if (isArray) for (; i < length; i++) {
+			value = callback.apply(obj[i], args);
+			if (false === value) break;
+		} else for (i in obj) {
+			value = callback.apply(obj[i], args);
+			if (false === value) break;
+		} else if (isArray) for (; i < length; i++) {
+			value = callback.call(obj[i], i, obj[i]);
+			if (false === value) break;
+		} else for (i in obj) {
+			value = callback.call(obj[i], i, obj[i]);
+			if (false === value) break;
+		}
+		return obj;
+	}
+	function isNullOrWhiteSpace(str) {
+		if (typeof str === "string") {
+			var isNullOrWhiteSpace = false;
+			if (str == null || str === "undefined") isNullOrWhiteSpace = true;
+			if (str.replace(/\s/g, "").length < 1) isNullOrWhiteSpace = true;
+			return isNullOrWhiteSpace;
+		}
+		if (typeof str === "undefined") {
+			return true;
+		}
+	}
+
+	/*
+	xml2json v 1.1
+	copyright 2005-2007 Thomas Frank
+ 
+	This program is free software under the terms of the 
+	GNU General Public License version 2 as published by the Free 
+	Software Foundation. It is distributed without any warranty.
+	*/
+	var xml2json = {
+		parser: function (xmlcode, ignoretags, debug) {
+			if (!ignoretags) {
+				ignoretags = "";
+			}
+			xmlcode = xmlcode.replace(/\s*\/>/g, "/>");
+			xmlcode = xmlcode.replace(/<\?[^>]*>/g, "").replace(/<\![^>]*>/g, "");
+			if (!ignoretags.sort) {
+				ignoretags = ignoretags.split(",");
+			}
+			var x = this.no_fast_endings(xmlcode);
+			x = this.attris_to_tags(x);
+			x = escape(x);
+			x = x.split("%3C").join("<").split("%3E").join(">").split("%3D").join("=").split("%22").join('"');
+			for (var i = 0; i < ignoretags.length; i++) {
+				x = x.replace(new RegExp("<" + ignoretags[i] + ">", "g"), "*$**" + ignoretags[i] + "**$*");
+				x = x.replace(new RegExp("</" + ignoretags[i] + ">", "g"), "*$***" + ignoretags[i] + "**$*");
+			}
+			x = "<JSONTAGWRAPPER>" + x + "</JSONTAGWRAPPER>";
+			this.xmlobject = {};
+			var y = this.xml_to_object(x).JSONTAGWRAPPER;
+			if (debug) {
+				y = this.show_json_structure(y, debug);
+			}
+			return y;
+		},
+		xml_to_object: function (xmlcode) {
+			var x = xmlcode.replace(/<\//g, "§");
+			x = x.split("<");
+			var y = [];
+			var level = 0;
+			var opentags = [];
+			for (var i = 1; i < x.length; i++) {
+				var tagname = x[i].split(">")[0];
+				opentags.push(tagname);
+				level++;
+				y.push(level + "<" + x[i].split("§")[0]);
+				while (x[i].indexOf("§" + opentags[opentags.length - 1] + ">") >= 0) {
+					level--;
+					opentags.pop();
+				}
+			}
+			var oldniva = -1;
+			var objname = "this.xmlobject";
+			for (var i = 0; i < y.length; i++) {
+				var preeval = "";
+				var niva = y[i].split("<")[0];
+				var tagnamn = y[i].split("<")[1].split(">")[0];
+				var rest = y[i].split(">")[1];
+				if (niva <= oldniva) {
+					var tabort = oldniva - niva + 1;
+					for (var j = 0; j < tabort; j++) {
+						objname = objname.substring(0, objname.lastIndexOf("."));
+					}
+				}
+				objname += "." + tagnamn;
+				var pobject = objname.substring(0, objname.lastIndexOf("."));
+				if (eval("typeof " + pobject) != "object") {
+					preeval += pobject + "={value:" + pobject + "};\n";
+				}
+				var objlast = objname.substring(objname.lastIndexOf(".") + 1);
+				var already = false;
+				for (k in eval(pobject)) {
+					if (k == objlast) {
+						already = true;
+					}
+				}
+				var onlywhites = true;
+				for (var s = 0; s < rest.length; s += 3) {
+					if (rest.charAt(s) != "%") {
+						onlywhites = false;
+					}
+				}
+				if (rest != "" && !onlywhites) {
+					if (rest / 1 != rest) {
+						rest = "'" + rest.replace(/\'/g, "\\'") + "'";
+						rest = rest.replace(/\*\$\*\*\*/g, "</");
+						rest = rest.replace(/\*\$\*\*/g, "<");
+						rest = rest.replace(/\*\*\$\*/g, ">");
+					}
+				} else {
+					rest = "{}";
+				}
+				if (rest.charAt(0) == "'") {
+					rest = "unescape(" + rest + ")";
+				}
+				if (already && !eval(objname + ".sort")) {
+					preeval += objname + "=[" + objname + "];\n";
+				}
+				var before = "=";
+				after = "";
+				if (already) {
+					before = ".push(";
+					after = ")";
+				}
+				var toeval = preeval + objname + before + rest + after;
+				eval(toeval);
+				if (eval(objname + ".sort")) {
+					objname += "[" + eval(objname + ".length-1") + "]";
+				}
+				oldniva = niva;
+			}
+			return this.xmlobject;
+		},
+		show_json_structure: function (obj, debug, l) {
+			var x = "";
+			if (obj.sort) {
+				x += "[\n";
+			} else {
+				x += "{\n";
+			}
+			for (var i in obj) {
+				if (!obj.sort) {
+					x += i + ":";
+				}
+				if (typeof obj[i] == "object") {
+					x += this.show_json_structure(obj[i], false, 1);
+				} else {
+					if (typeof obj[i] == "function") {
+						var v = obj[i] + "";
+						x += v;
+					} else if (typeof obj[i] != "string") {
+						x += obj[i] + ",\n";
+					} else {
+						x += "'" + obj[i].replace(/\'/g, "\\'").replace(/\n/g, "\\n").replace(/\t/g, "\\t").replace(/\r/g, "\\r") + "',\n";
+					}
+				}
+			}
+			if (obj.sort) {
+				x += "],\n";
+			} else {
+				x += "},\n";
+			}
+			if (!l) {
+				x = x.substring(0, x.lastIndexOf(","));
+				x = x.replace(new RegExp(",\n}", "g"), "\n}");
+				x = x.replace(new RegExp(",\n]", "g"), "\n]");
+				var y = x.split("\n");
+				x = "";
+				var lvl = 0;
+				for (var i = 0; i < y.length; i++) {
+					if (y[i].indexOf("}") >= 0 || y[i].indexOf("]") >= 0) {
+						lvl--;
+					}
+					tabs = "";
+					for (var j = 0; j < lvl; j++) {
+						tabs += "	";
+					}
+					x += tabs + y[i] + "\n";
+					if (y[i].indexOf("{") >= 0 || y[i].indexOf("[") >= 0) {
+						lvl++;
+					}
+				}
+				if (debug == "html") {
+					x = x.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+					x = x.replace(/\n/g, "<BR>").replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;");
+				}
+				if (debug == "compact") {
+					x = x.replace(/\n/g, "").replace(/\t/g, "");
+				}
+			}
+			return x;
+		},
+		no_fast_endings: function (x) {
+			x = x.split("/>");
+			for (var i = 1; i < x.length; i++) {
+				var t = x[i - 1].substring(x[i - 1].lastIndexOf("<") + 1).split(" ")[0];
+				x[i] = "></" + t + ">" + x[i];
+			}
+			x = x.join("");
+			return x;
+		},
+		attris_to_tags: function (x) {
+			var d = " =\"'".split("");
+			x = x.split(">");
+			for (var i = 0; i < x.length; i++) {
+				var temp = x[i].split("<");
+				for (var r = 0; r < 4; r++) {
+					temp[0] = temp[0].replace(new RegExp(d[r], "g"), "_jsonconvtemp" + r + "_");
+				}
+				if (!isNullOrWhiteSpace(temp[0]) && !isNullOrWhiteSpace(temp[1])) temp[0] = "<__value>" + temp[0] + "</__value>";
+				if (temp[1]) {
+					temp[1] = temp[1].replace(/'/g, '"');
+					temp[1] = temp[1].split('"');
+					for (var j = 1; j < temp[1].length; j += 2) {
+						for (var r = 0; r < 4; r++) {
+							temp[1][j] = temp[1][j].replace(new RegExp(d[r], "g"), "_jsonconvtemp" + r + "_");
+						}
+					}
+					temp[1] = temp[1].join('"');
+				}
+				x[i] = temp.join("<");
+			}
+			x = x.join(">");
+			x = x.replace(/ ([^=]*)=([^ |>]*)/g, "><$1>$2</$1");
+			x = x.replace(/>"/g, ">").replace(/"</g, "<");
+			for (var r = 0; r < 4; r++) {
+				x = x.replace(new RegExp("_jsonconvtemp" + r + "_", "g"), d[r]);
+			}
+			return x;
+		}
+	};
+
+	var MAX_DESCRIPTION_LEN = 1000;
+	//
+	//  Extension events. 
+	//  Copy plain comments into description property if available.
+	//  Do not copy if VS doc comments are there.
+	//
+	intellisense.addEventListener('statementcompletionhint', function (event) {
+		if (event.symbolHelp.description) return;
+		var itemValue = event.completionItem.value;
+		if (typeof itemValue === "function") {
+			var functionHelp = event.symbolHelp.functionHelp;
+			if (!canApplyComments(functionHelp)) return;
+			var comments = intellisense.getFunctionComments(itemValue);
+			comments.above = comments.above || event.completionItem.comments;
+			applyComments(functionHelp, comments);
+		} else {
+			var comments = event.completionItem.comments;
+			if (isDocComment(comments)) return;
+			setDescription(event.symbolHelp, comments);
+		}
+	});
+	function toJSONWithFuncs(obj) {
+		Object.prototype.toJSON = function () {
+			var sobj = {}, i;
+			for (i in this)
+				if (this.hasOwnProperty(i))
+					sobj[i] = typeof this[i] == 'function' ?
+					  this[i].toString() : this[i];
+
+			return sobj;
+		};
+
+		var str = JSON.stringify(obj, null, " ");
+
+		delete Object.prototype.toJSON;
+
+		return str;
+	}
+	intellisense.addEventListener('signaturehelp', function (event) {
+		var functionHelp = event.functionHelp;
+		var functionName = event && event.functionHelp && event.functionHelp.functionName;
+		if (event.parentObject && typeof event.parentObject === "function"
+			&& (functionName === "call" || functionName === "apply")) {
+			//call and apply helpers
+			var f = intellisense.getFunctionComments(event.parentObject);
+			event["_$functionComments"] = f;
+			var xmldoc = f.xmldoc = xml2json.parser(f.inside);
+			if (!xmldoc.signature)
+				xmldoc.signature = [xmldoc];
+			//event.functionHelp.signatures[0].params[0].description == "abcd"; // first parameter's description
+			var signatures = functionHelp.signatures;
+			if (functionName === "call") {
+				signatures.splice(0, signatures.length);
+				each(xmldoc.signature, function (index, signature) {
+					var description = signature && signature.summary && signature.summary.__value;
+					var s = {
+						description: [description, "", ".call executes the function with on the provided `this` context and with the provided parameters"].join("<br/>"),
+						params: []
+					};
+					s.params.push({
+						"name": "this",
+						"type": "",
+						"description": "Specify who is `this` when calling this method <br/>i.e. this to forward the current this",
+						"locid": "",
+						"elementType": "",
+						"optional": false
+					});
+					if (signature.param) {
+						if (typeof signature.param.push !== "function")
+							signature.param = [signature.param];
+						each(signature.param, function (index, param) {
+							param.description = param.__value;
+							each(["integer", "domElement", "mayBeNull", "elementInteger", "elementDomElement", "elementMayBeNull", "parameterArray", "optional"], function (index, attr) {
+								if (typeof param[attr] === "string")
+									param[attr] = param[attr] == "true" || param[attr] == "1" || param[attr] == true;
+							});
+							
+							delete param.__value;
+							s.params.push(param);
+						});
+					}
+					signatures.push(s);
+				});
+			}
+			else {
+				var description = xmldoc && xmldoc.signature && xmldoc.signature[0] && xmldoc.signature[0].summary && xmldoc.signature[0].summary.__value;
+				signatures[0].description = [description, "", ".apply executes the function with on the provided `this` context and with the provided array of parameters as arguments"].join("<br/>");
+				signatures[0].params[0].name = "this";
+				signatures[0].params[0].description = "Specify who is `this` when calling this method <br/>i.e. this to forward the current this";
+				signatures[0].params[1].name = "arguments";
+				signatures[0].params[1].description = "Specify an Array with the arguments to be sent as parameters <br/>i.e. arguments to forward the current parameters";
+			}
+			//intellisense.logMessage("var a = " + toJSONWithFuncs(event, null, " "));
+
+			return;
+		}
+		if (!canApplyComments(event.functionHelp)) return;
+		applyComments(event.functionHelp, event.functionComments);
+	});
+	//
+	//  Helpers
+	//
+	function applyComments(functionHelp, comments) {
+		var signatures = functionHelp.signatures;
+		var signature = signatures[0];
+		// Do not apply if VS doc comments were applied
+		if (!canApplyComments(functionHelp)) return;
+		// Do not apply VS doc comments
+		if (isDocComment(comments.inside)) return;
+		if (comments.above && !isDocComment(comments.above)) {
+			setDescription(signature, comments.above);
+		}
+		// Populate parameters descriptions
+		signature.params.forEach(function (param, index) {
+			var paramComment = comments.paramComments[index];
+			if (!paramComment.comment) return;
+			if (paramComment.name != param.name) return false;
+			setDescription(param, paramComment.comment);
+		});
+	}
+	function canApplyComments(functionHelp) {
+		var signatures = functionHelp.signatures;
+		var signature = signatures[0];
+		if (signatures.length > 1) return false;
+		if (signature.description) return false;
+		if (!signature.params.every(function (param) { return !param.description; })) return false;
+		return true;
+	}
+	function isDocComment(comment) {
+		// Simple heuristic to detect xml doc comments.
+		return !!(comment && comment.charAt(0) === '<');
+	}
+	function setDescription(o, text) {
+		// Trim description if needed
+		text = (text && text.length > MAX_DESCRIPTION_LEN) ? text.substring(0, MAX_DESCRIPTION_LEN) + '...' : text;
+		// Encode characters to accomodate markup as well as new lines
+		text = text.replace(/&(?!#?\w+;)/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/(\r\n|\n|\r)/gm, "<br/>");
+		o.description = text;
+	}
+})();
