@@ -32,7 +32,7 @@ It comes in two flavours:
 function(base, baseCtor) { this.somePrototypeMethod1 =  ...; this.somePrototypeMethod2 =  ...; } }
 ```
 
-* [`Function.prototype.inheritWith(creator)`](#inheritwith-flavour) 
+* [`Function.prototype.inheritWith(creator)`](#inheritwith-flavour) - recommended
 It makes usage of __proto__ on all new browsers (which makes it blazing fast) except `Internet Explorer` and maybe other ancient browser where it fallbacks to `for (var key in obj)` statement.
 __proto__ will become standard in ECMAScript 6
 ```javascript
@@ -68,7 +68,7 @@ var Square = Figure.fastClass(function(base, baseCtor) {
 })
 ```
 
-#### `.inheritWith` flavour
+#### `.inheritWith` flavour 
 
 To define the `derrived class` Square:
 ```javascript
@@ -88,7 +88,8 @@ var Square = Figure.inheritWith(function(base, baseCtor) {
 
 As you can see in both cases the definition is pretty simple and very similar. 
 
-However the `.inheritWith` flavour comes with about 5-10% <a href="http://jsperf.com/js-inheritance-performance/35" target="_blank"><code>performance cost</code></a> depending on the actual browser and number of members.
+However the `.inheritWith` flavour comes with about 3-15% <a href="http://jsperf.com/js-inheritance-performance/34" target="_blank"><code>performance boost</code></a> depending on the actual browser and number of members.
+That is because we are simply setting `__proto__` with the BaseClass.prototype for those browsers who support it (all nowdays browsers except `IE<=10`)
 
 #### Usage
 
