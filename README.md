@@ -213,11 +213,9 @@ var Dog = Animal.fastClass(function(base, baseCtor) {
 });
 ```
 
-### Some gems
-Although it could hurt `hard-core performance` in real live it doesn't feel much of a difference betweeen `.innerWith` and `.fastClass` upon same browser. 
-Between different browsers is a whole different story.
+### First `definition` 
+You can hdefine the first `class' constructor function` as following:
 
-However, for those cases where you don't count every performance bit then you can also define de primary function like this:
 ```javascript
 var A = function(name) { 
     this.name = name; 
