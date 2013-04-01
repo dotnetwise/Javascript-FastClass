@@ -230,7 +230,7 @@ var A = function(name) {
 The `define` function copies all the members of the returned object to the `function.prorortpe` *(`A.prototype`)* and returns it *(`A`)*
 
 
-## Where?
+## Where to get it from?
 Beside GitHub, you can download it as a <a href="http://nuget.org/packages/Javascript-FastClass/" target="_blank"><code>Nuget package</code></a> in Visual Studio from<a href="http://nuget.org/packages/Javascript-FastClass/" target="_blank"><code>here</code></a>
 ```javascript
 Install-Package Javascript-FastClass
@@ -239,6 +239,7 @@ Install-Package Javascript-FastClass
 ## What's next?
 * [Private methods support!](../../wiki/Private-Methods)
 * [Self test](../../wiki/Self-Test)
+* Mixins - to be added
 
 Do you have a better & faster way? Share it! We would love to seeing creativity in action!
 
