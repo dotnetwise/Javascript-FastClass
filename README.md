@@ -3,9 +3,10 @@ Javascript-fastClass
 A faster and easier Javascript Inheritance 
 
 
-*  <a href="http://jsperf.com/js-inheritance-performance/25" target="_blank"><code>Performance tests</code></a> - 3 classes * 100 instances each
-*  <a href="http://jsperf.com/js-inheritance-performance/26" target="_blank"><code>Performance tests among fastest only</code></a> - 3 classes * 100 instances each
-*  A more 'real wolrd' <a href="http://jsperf.com/js-inheritance-performance/30" target="_blank"><code>performance test</code></a> - 3 classes * 500 instances each
+## Performance tests
+*  Among <a href="http://jsperf.com/js-inheritance-performance/36" target="_blank"><code>popular libraries define + usage</code></a> - 3 classes and 3 methods * 500 instances each
+*  <a href="http://jsperf.com/js-inheritance-performance/35" target="_blank"><code>Fastest libraries define + usage</code></a> - 3 classes and 3 methods * 500 instances each
+*  <a href="http://jsperf.com/js-inheritance-performance/34" target="_blank"><code>Fastest libraries define only</code></a> - 3 classes and 3 methods * 1 instances each
 
 <div align="center">
 <img src="../../wiki/images/NugetIcon.png"/>
@@ -16,7 +17,7 @@ Native Javascript Inheritance is a pin in the ass. Even if you understand it per
 
 There are a lot of libraries which aims to help you with such that, but the main question is:
 
-What is <a href="http://jsperf.com/js-inheritance-performance/25" target="_blank"><code>the fastest</code></a> vs <a target="_blank" href="https://github.com/njoubert/inheritance.js/blob/master/INHERITANCE.md"><code>most convenient</code></a> to create <a href="http://msdn.microsoft.com/en-us/magazine/ff852808.aspx" target="_blank"><code>Prototypal Inheritance</code></a> with?
+What is <a href="http://jsperf.com/js-inheritance-performance/36" target="_blank"><code>the fastest</code></a> vs <a target="_blank" href="https://github.com/njoubert/inheritance.js/blob/master/INHERITANCE.md"><code>most convenient</code></a> to create <a href="http://msdn.microsoft.com/en-us/magazine/ff852808.aspx" target="_blank"><code>Prototypal Inheritance</code></a> with?
 
 ## When to use it?
 You do need this library when you can't use a language that <a href="https://github.com/jashkenas/coffee-script/wiki/List-of-languages-that-compile-to-JS" target="_blank"><code>compiles</code></a> into javascript.
@@ -31,7 +32,9 @@ It comes in two flavours:
 function(base, baseCtor) { this.somePrototypeMethod1 =  ...; this.somePrototypeMethod2 =  ...; } }
 ```
 
-* [`Function.prototype.inheritWith(creator)`](#inheritwith-flavour) - a little bit slower as it iterates the members `for (var i in newPrototype)` of the new prototype
+* [`Function.prototype.inheritWith(creator)`](#inheritwith-flavour) 
+It makes usage of __proto__ on all new browsers (which makes it blazing fast) except `Internet Explorer` and maybe other ancient browser where it fallbacks to `for (var key in obj)` statement.
+__proto__ will become standard in ECMAScript 6
 ```javascript
 function(base, baseCtor) { return { somePrototypeMethod1: ..., somePrototypeMethod2: ...} }
 ```
@@ -85,7 +88,7 @@ var Square = Figure.inheritWith(function(base, baseCtor) {
 
 As you can see in both cases the definition is pretty simple and very similar. 
 
-However the `.inheritWith` flavour comes with about 15-25% <a href="http://jsperf.com/js-inheritance-performance/25" target="_blank"><code>performance cost</code></a> depending on the actual browser and number of members.
+However the `.inheritWith` flavour comes with about 5-10% <a href="http://jsperf.com/js-inheritance-performance/35" target="_blank"><code>performance cost</code></a> depending on the actual browser and number of members.
 
 #### Usage
 
