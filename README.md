@@ -236,8 +236,8 @@ Install-Package Javascript-FastClass
 ```
 
 ## What's next?
-* [Private methods support!](wiki/Private-Methods)
-* [Self test](wiki/Self-Test)
+* [Private methods support!](../../wiki/Private-Methods)
+* [Self test](../../wiki/Self-Test)
 
 Do you have a better & faster way? Share it! We would love to seeing creativity in action!
 
