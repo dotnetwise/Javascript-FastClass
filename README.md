@@ -3,9 +3,10 @@ Javascript-fastClass
 A faster and easier Javascript Inheritance 
 
 
-*  <a href="http://jsperf.com/js-inheritance-performance/25" target="_blank"><code>Performance tests</code></a> - 3 classes * 100 instances each
-*  <a href="http://jsperf.com/js-inheritance-performance/26" target="_blank"><code>Performance tests among fastest only</code></a> - 3 classes * 100 instances each
-*  A more 'real wolrd' <a href="http://jsperf.com/js-inheritance-performance/30" target="_blank"><code>performance test</code></a> - 3 classes * 500 instances each
+## Performance tests
+*  Among <a href="http://jsperf.com/js-inheritance-performance/36" target="_blank"><code>popular libraries define + usage</code></a> - 3 classes and 3 methods * 500 instances each
+*  <a href="http://jsperf.com/js-inheritance-performance/35" target="_blank"><code>Fastest libraries define + usage</code></a> - 3 classes and 3 methods * 500 instances each
+*  <a href="http://jsperf.com/js-inheritance-performance/34" target="_blank"><code>Fastest libraries define only</code></a> - 3 classes and 3 methods * 1 instances each
 
 <div align="center">
 <img src="../../wiki/images/NugetIcon.png"/>
@@ -16,7 +17,7 @@ Native Javascript Inheritance is a pin in the ass. Even if you understand it per
 
 There are a lot of libraries which aims to help you with such that, but the main question is:
 
-What is <a href="http://jsperf.com/js-inheritance-performance/25" target="_blank"><code>the fastest</code></a> vs <a target="_blank" href="https://github.com/njoubert/inheritance.js/blob/master/INHERITANCE.md"><code>most convenient</code></a> to create <a href="http://msdn.microsoft.com/en-us/magazine/ff852808.aspx" target="_blank"><code>Prototypal Inheritance</code></a> with?
+What is <a href="http://jsperf.com/js-inheritance-performance/36" target="_blank"><code>the fastest</code></a> vs <a target="_blank" href="https://github.com/njoubert/inheritance.js/blob/master/INHERITANCE.md"><code>most convenient</code></a> to create <a href="http://msdn.microsoft.com/en-us/magazine/ff852808.aspx" target="_blank"><code>Prototypal Inheritance</code></a> with?
 
 ## When to use it?
 You do need this library when you can't use a language that <a href="https://github.com/jashkenas/coffee-script/wiki/List-of-languages-that-compile-to-JS" target="_blank"><code>compiles</code></a> into javascript.
@@ -24,14 +25,18 @@ You do need this library when you can't use a language that <a href="https://git
 e.g. <a href="https://developers.google.com/closure/" target="_blank">Google Closure</a>, <a href="http://www.typescriptlang.org/Playground/" target="_blank">TypeScript</a>, <a href="http://arcturo.github.com/library/coffeescript/03_classes.html" target="_blank">Coffee Script</a> etc.
 
 ## What is it? 
-FastClass is a very tiny library (<0.5KB minified and gzipped) that helps you quickly derrive your `classes` so to speak. 
+FastClass is a very tiny library (~0.6KB minified and gzipped) that helps you quickly derrive your `classes` so to speak. 
 It comes in two flavours:
-* [`Function.prototype.fastClass(creator)`](#fastclass-flavour) - fastest, does not iterate the members when creates the derrived function
+* [`Function.prototype.fastClass(creator)`](#fastclass-flavour) - sets the `Base.prototype` to the `creator` function
 ```javascript
 function(base, baseCtor) { this.somePrototypeMethod1 =  ...; this.somePrototypeMethod2 =  ...; } }
 ```
 
-* [`Function.prototype.inheritWith(creator)`](#inheritwith-flavour) - a little bit slower as it iterates the members `for (var i in newPrototype)` of the new prototype
+* [`Function.prototype.inheritWith(creator)`](#inheritwith-flavour) - **recommended**. 
+
+It makes usage of __proto__ on all new browsers (which makes it blazing fast) except `Internet Explorer` and maybe other ancient browsers where it fallbacks to `for (var key in obj)` statement.
+
+Note `__proto__` will become standard in <a href="http://javascript.spec.whatwg.org/#object.prototype.__proto__" target="_blank">ECMAScript 6</a>
 ```javascript
 function(base, baseCtor) { return { somePrototypeMethod1: ..., somePrototypeMethod2: ...} }
 ```
@@ -65,7 +70,7 @@ var Square = Figure.fastClass(function(base, baseCtor) {
 })
 ```
 
-#### `.inheritWith` flavour
+#### `.inheritWith` flavour 
 
 To define the `derrived class` Square:
 ```javascript
@@ -85,7 +90,12 @@ var Square = Figure.inheritWith(function(base, baseCtor) {
 
 As you can see in both cases the definition is pretty simple and very similar. 
 
-However the `.inheritWith` flavour comes with about 15-25% <a href="http://jsperf.com/js-inheritance-performance/25" target="_blank"><code>performance cost</code></a> depending on the actual browser and number of members.
+However the `.inheritWith` flavour comes with about 5-15% <a href="http://jsperf.com/js-inheritance-performance/34" target="_blank"><code>performance boost</code></a> depending on the actual browser and number of members.
+That is because we are simply setting `__proto__` with the BaseClass.prototype for those browsers who support it (all nowdays browsers except `IE<=10`)
+
+### The constructor
+In both cases we the `constructor` is the function that is returned as the `derrived class' constructor`. 
+The `constructor` is optional and we should only add it when we have some custom code as both functions will add it for us otherswise.
 
 #### Usage
 
@@ -208,11 +218,9 @@ var Dog = Animal.fastClass(function(base, baseCtor) {
 });
 ```
 
-### Some gems
-Although it could hurt `hard-core performance` in real live it doesn't feel much of a difference betweeen `.innerWith` and `.fastClass` upon same browser. 
-Between different browsers is a whole different story.
+### First `definition` 
+You can hdefine the first `class' constructor function` as following:
 
-However, for those cases where you don't count every performance bit then you can also define de primary function like this:
 ```javascript
 var A = function(name) { 
     this.name = name; 
@@ -226,13 +234,17 @@ var A = function(name) {
 The `define` function copies all the members of the returned object to the `function.prorortpe` *(`A.prototype`)* and returns it *(`A`)*
 
 
-## Where?
+## Where to get it from?
 Beside GitHub, you can download it as a <a href="http://nuget.org/packages/Javascript-FastClass/" target="_blank"><code>Nuget package</code></a> in Visual Studio from<a href="http://nuget.org/packages/Javascript-FastClass/" target="_blank"><code>here</code></a>
 ```javascript
 Install-Package Javascript-FastClass
 ```
 
 ## What's next?
+* [Private methods support!](../../wiki/Private-Methods)
+* [Self test](../../wiki/Self-Test)
+* Mixins - to be added
+
 Do you have a better & faster way? Share it! We would love to seeing creativity in action!
 
 [![githalytics.com alpha](https://cruel-carlota.pagodabox.com/ced79a6263a52ce6aed7515d0cd0b0f3 "githalytics.com")](http://githalytics.com/dotnetwise/Javascript-FastClass)
