@@ -7,7 +7,10 @@
 	var Object_defineProperty = Object.defineProperty;
 	var Function_prototype = Function.prototype;
 	var canDefineNonEnumerableProperty = typeof Object_defineProperty === "function";
+	var Array_prototype = Array.prototype;
+
 	var supportsProto = {};
+
 	supportsProto = supportsProto.__proto__ === Object.prototype;
 	if (supportsProto) {
 		try {
@@ -17,9 +20,18 @@
 		} catch (ex) { supportsProto = false; }
 	}
 	function __() { };
-	Function_prototype.fastClass = function (creator, makeConstructorNotEnumerable) {
+	//for ancient browsers - polyfill Array.prototype.forEach
+	if (!Array_prototype.forEach) {
+		Array_prototype.forEach = function (fn, scope) {
+			for (var i = 0, len = this.length; i < len; ++i) {
+				fn.call(scope || this, this[i], i, this);
+			}
+		}
+	}
+	Function_prototype.fastClass = function (creator, mixins) {
 		/// <summary>Inherits the function's prototype to a new function named constructor returned by the creator parameter</summary>
-		/// <param name="creator" type="function(base, baseCtor) { }">where base is BaseClass.prototype and baseCtor is BaseClass - aka the function you are calling .fastClass on</param>
+		/// <param name="creator" type="Function">function(base, baseCtor) { this.constructor = function() {..}; this.method1 = function() {...}... }<br/>where base is BaseClass.prototype and baseCtor is BaseClass - aka the function you are calling .fastClass on</param>
+		/// <param name="mixins"  type="Function || Plain Object" optional="true" parameterArray="true">Specify one ore more mixins to be added to the derrived function's prototype. <br/>A Mixin is either a function which returns a plain object, or a plan object in itself. It contains method or properties to be added to this function's prototype</param>
 
 		//this == constructor of the base "Class"
 		var baseClass = this;
@@ -29,29 +41,25 @@
 
 		//creating the derrived class' prototype
 		var derrivedProrotype = new creator(base, this);
-
+		var Derrived;
 		//did you forget or not intend to add a constructor? We'll add one for you
 		if (!derrivedProrotype.hasOwnProperty("constructor"))
 			derrivedProrotype.constructor = function () { baseClass.apply(this, arguments); }
-
-		//By default we set the constructor but we don't make it non-enumerable
-		//if we care about constructor.prototype.constructor === constructor to be non-Enumerable we need to use Object.defineProperty
-		if (makeConstructorNotEnumerable && canDefineNonEnumerableProperty) //this is not default as it carries over some performance overhead
-			Object_defineProperty(prototype, 'constructor', {
-				enumerable: false,
-				value: Derrived
-			});
-
+		Derrived = derrivedProrotype.constructor;
 		//setting the derrivedPrototype to constructor's prototype
-		derrivedProrotype.constructor.prototype = derrivedProrotype;
+		Derrived.prototype = derrivedProrotype;
 
+		creator = null;//set the first parameter to null as we have already 'shared' the base prototype into derrivedPrototype in the creator function by setting creator.prototype = base on above
+		arguments.length > 1 && Function_prototype.define.apply(Derrived, arguments);
 		//returning the constructor
-		return derrivedProrotype.constructor;
+		return Derrived;
 	};
 
-	Function_prototype.inheritWith = !supportsProto ? function (creator, makeConstructorNotEnumerable) {
+	Function_prototype.inheritWith = !supportsProto ? function (creator, mixins) {
 		/// <summary>Inherits the function's prototype to a new function named constructor returned by the creator parameter</summary>
-		/// <param name="creator" type="function(base, baseCtor) { return { constructor: function() {..}...} }">where base is BaseClass.prototype and baseCtor is BaseClass - aka the function you are calling .inheritWith on</param>
+		/// <param name="creator" type="Function">function(base, baseCtor) { return { constructor: function() {..}...} }<br/>where base is BaseClass.prototype and baseCtor is BaseClass - aka the function you are calling .inheritWith on</param>
+		/// <param name="mixins"  type="Function || Plain Object" optional="true" parameterArray="true">Specify one ore more mixins to be added to the derrived function's prototype. <br/>A Mixin is either a function which returns a plain object, or a plan object in itself. It contains method or properties to be added to this function's prototype</param>
+
 		var baseCtor = this;
 		var creatorResult = creator.call(this, this.prototype, this) || {};
 		var Derrived = creatorResult.constructor ||
@@ -62,22 +70,21 @@
 		__.prototype = this.prototype;
 		Derrived.prototype = derrivedPrototype = new __;
 
-		for (var p in creatorResult)
-			derrivedPrototype[p] = creatorResult[p];
-
-		//By default we set the constructor but we don't make it non-enumerable
-		//if we care about Derrived.prototype.constructor === Derrived to be non-Enumerable we need to use Object.defineProperty
-		if (makeConstructorNotEnumerable && canDefineNonEnumerableProperty) //this is not default as it carries over some performance overhead
-			Object_defineProperty(derrivedPrototype, 'constructor', {
-				enumerable: false,
-				value: Derrived
-			});
+		creator = creatorResult;//change the first parameter with the creatorResult
+		Function_prototype.define.apply(Derrived, arguments);
+		WAssert(true, function () {
+			//trigger intellisense on VS2012 for base class members, because same as IE, VS2012 doesn't support 
+			for (var i in derrivedPrototype)
+				if (!creatorResult.hasOwnProperty(i))
+					creatorResult[i] = derrivedPrototype[i];
+		});
 
 		return Derrived;
 	} :// when browser supports __proto__ setting it is way faster than iterating the object
-	function (creator, makeConstructorNotEnumerable) {
+	function (creator, mixins) {
 		/// <summary>Inherits the function's prototype to a new function named constructor returned by the creator parameter</summary>
-		/// <param name="creator" type="function(base, baseCtor) { return { constructor: function() {..}...} }">where base is BaseClass.prototype and baseCtor is BaseClass - aka the function you are calling .inheritWith on</param>
+		/// <param name="creator" type="Function">function(base, baseCtor) { return { constructor: function() {..}...} }<br/>where base is BaseClass.prototype and baseCtor is BaseClass - aka the function you are calling .inheritWith on</param>
+		/// <param name="mixins"  type="Function || Plain Object" optional="true" parameterArray="true">Specify one ore more mixins to be added to the derrived class. <br/>A Mixin is either a function which returns a plain object, or a plan object in itself. It contains method or properties to be added to this function's prototype</param>
 		var baseCtor = this;
 		var derrivedPrototype = creator.call(this, this.prototype, this) || {};
 		var Derrived = derrivedPrototype.constructor ||
@@ -86,49 +93,52 @@
         }; //automatic constructor if ommited
 		Derrived.prototype = derrivedPrototype;
 		derrivedPrototype.__proto__ = this.prototype;
-
-		//By default we set the constructor but we don't make it non-enumerable
-		//if we care about Derrived.prototype.constructor === Derrived to be non-Enumerable we need to use Object.defineProperty
-		if (makeConstructorNotEnumerable && canDefineNonEnumerableProperty) //this is not default as it carries over some performance overhead
-			Object_defineProperty(derrivedPrototype, 'constructor', {
-				enumerable: false,
-				value: Derrived
-			});
+		creator = null;//set the first parameter to null as we have already 'shared' the base prototype into derrivedPrototype by using __proto__
+		arguments.length > 1 && Function_prototype.define.apply(Derrived, arguments);
 
 		return Derrived;
 	};
 
-	
-	Function_prototype.define = function (prototype) {
+
+	Function_prototype.define = function (prototype, mixins) {
 		/// <summary>Define members on the prototype of the given function with the custom methods and fields specified in the prototype parameter.</summary>
-		/// <param name="prototype" type="Plain Object">A custom object with the methods or properties to be added on Extendee.prototype</param>
+		/// <param name="prototype" type="Function || Plain Object">A custom object with the methods or properties to be added on Extendee.prototype</param>
+		/// <param name="mixins"  type="Function || Plain Object" optional="true" parameterArray="true">Specify one ore more mixins to be added to this function's prototype. <br/>A Mixin is either a function which returns a plain object, or a plan object in itself. It contains method or properties to be added to this function's prototype</param>
 
 		var extendeePrototype = this.prototype;
 
 		if (prototype) {
+			if (typeof prototype === "function")
+				prototype = prototype.call(extendeePrototype, this);
 			for (var key in prototype)
 				extendeePrototype[key] = prototype[key];
 		}
+		arguments.length > 1 && Array_prototype.forEach.call(arguments, function (mixin, index) {
+			mixin = index ? (typeof mixin === 'function' ? mixin(prototype, ctor) : mixin) : null;
+			if (mixin) {
+				for (var key in mixin) {
+					WAssert(!extendeePrototype[key], function () {
+						//trigger intellisense on VS2012 for mixins
+						if (!extendeePrototype.hasOwnProperty(key))
+							extendeePrototype[key] = mixin[key];
+						return "The {0} mixin defines a {1} named {2} which is already defined on the class"
+					}, index - 1, typeof mixin[key] === "function" ? "function" : "member", key)();
+					extendeePrototype[key] = mixin[key];
+				}
+			}
+		});
 		return this;
 	}
 
 
-	Function.define = function (creator, makeConstructorNotEnumerable) {
+	Function.define = function (creator, mixins) {
 		/// <summary>Defines a function named constructor returned by the creator parameter and extends it's protoype with all other functions</summary>
-		/// <param name="creator" type="function() { return { constructor: function() {..}...} }"></param>
-		var creatorResult = creator.call(this) || {};
+		/// <param name="creator" type="Functionfunction() { return { constructor: function() {..}...} }"></param>
+		/// <param name="mixins"  type="Function || Plain Object" optional="true" parameterArray="true">Specify one ore more mixins to be added to the returned "constructor" function's prototype. <br/>A Mixin is either a function which returns a plain object, or a plan object in itself. It contains method or properties to be added to this function's prototype</param>
+		var creatorResult = (typeof creator === "function" ? creator : creator.call(this)) || {};
 		var constructor = creatorResult.constructor || function () { }; //automatic constructor if ommited
-		var prototype = constructor.prototype;
-		for (var p in creatorResult)
-			prototype[p] = creatorResult[p];
-
-		//By default we set the constructor but we don't make it non-enumerable
-		//if we care about constructor.prototype.constructor === constructor to be non-Enumerable we need to use Object.defineProperty
-		if (makeConstructorNotEnumerable && canDefineNonEnumerableProperty) //this is not default as it carries over some performance overhead
-			Object_defineProperty(prototype, 'constructor', {
-				enumerable: false,
-				value: Derrived
-			});
+		creator = null;
+		arguments.length > 1 && Function_prototype.define.apply(constructor, arguments);
 
 		return constructor;
 	};
