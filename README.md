@@ -129,7 +129,7 @@ var A = Function.define(function(name){
 ```
 All of the above methods are doing the same thing.
 
-### Inheritance
+## Inheritance
 
 A classical example to use inheritance when you have a base class called `Figure` and a derrived class called `Square`.
 
