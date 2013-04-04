@@ -8,9 +8,6 @@ A faster and easier way to define Javascript Prototypal Inheritance: `classes` a
 *  <a href="http://jsperf.com/js-inheritance-performance/35" target="_blank"><code>Fastest libraries define + usage</code></a> - 3 classes and 3 methods * 500 instances each
 *  <a href="http://jsperf.com/js-inheritance-performance/34" target="_blank"><code>Fastest libraries define only</code></a> - 3 classes and 3 methods * 1 instances each
 
-<div align="center">
-<img src="../../wiki/images/NugetIcon.png"/>
-</div>
 ## Sugar syntax
 ```javascript
 var Vehicle = Function.define(function(name)){
@@ -48,6 +45,9 @@ toyota.draw();
 //Drawing a red car. 
 //Drawing a tyota prius vechicle.
 ```
+<div align="center">
+<img src="../../wiki/images/NugetIcon.png"/>
+</div>
 
 ## Why yet another library?
 Native javascript inheritance is a pin in the ass. Even if you understand it perfectly it still requires some hideous repetivie code.
