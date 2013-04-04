@@ -119,3 +119,22 @@ test("Function.define with an object", function () {
 	f.x(20);
 	equal(f.x(), 20);
 });
+test("Function.define should create mixins the same way as function(){}.define({}) does", function () {
+	var xMixin = Function.define({
+		constructor: function () {
+			this.xyz = 1;
+		},
+		xxyyzz: function () { return this.xyz;}
+	});
+	var F = Function.define({
+		constructor: function (abc) {
+			this.abc = abc;
+		}
+	}, xMixin, Point);
+	var f = new F("abc");
+	equal(typeof f.x, "function", "Function.define(function() {}, {}, Point) should automatically initialize mixin Point");
+	equal(f.abc, "abc");
+	equal(f.xyz, 1);
+	f.xyz = 30;
+	equal(f.xxyyzz(), 30);
+});

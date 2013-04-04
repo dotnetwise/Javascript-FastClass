@@ -158,6 +158,7 @@
 			}
 			else mixinValue = mixin;
 			if (mixinValue) {
+				isFunction && extendeePrototype.__mixins__.push(mixin);
 				for (var key in mixinValue) {
 					WAssert(true, function () {
 						//trigger intellisense on VS2012 for mixins
@@ -169,7 +170,6 @@
 							throw msg;
 						}
 					});
-					isFunction && extendeePrototype.__mixins__.push(mixin);
 					extendeePrototype[key] = mixinValue[key];
 				}
 			}
@@ -204,22 +204,24 @@
 		/// </signature>
 		var result;
 		var constructor = func || function () { }; //automatic constructor if ommited
+		var applyDefine = arguments.length > 1;
 		if (typeof func !== "function") {
-			constructor = func.constructor || function () {};
+			constructor = func.constructor || function () { };
+			applyDefine = true;
 		}
 		else {
 			func = prototype;
 			prototype = null;
 		}
-		arguments.length > 1 && Function_prototype.define.apply(constructor, arguments);
+		applyDefine && Function_prototype.define.apply(constructor, arguments);
 
 		result = function () {
 			// automatically call initMixins and then the first constructor
 			Function.initMixins(this);
 			constructor.apply(this, arguments);
 		}
-		__.prototype = constructor.prototype;
-		result.prototype = new __;
+		//we are sharing constructor's prototype
+		result.prototype = constructor.prototype;
 		//forward the VS2012 intellisense to the given constructor function
 		WAssert(true, window.vs2012Intellisense && function () {
 			intellisense.redirectDefinition(result, constructor);
@@ -228,15 +230,19 @@
 	};
 
 	Function.initMixins = function (o) {
-		var p = o, mixins, length, i, mixin, calledMixins = {};
-		while (p) {
-			p = supportsProto ? p.__proto__ : Object.getPrototypeOf(p);
-			if (p && p.hasOwnProperty("__mixins__") && (mixins = p.__mixins__) && (length = mixins.length))
-				for (i = 0; mixin = mixins[i], i < length; i++)
-					if (!(mixin in calledMixins)) {
-						calledMixins[mixin] = 1;
-						mixins[i].call(o, p, p.constructor);
-					}
+		if (o && !o.__initMixins__) {
+			var p = o, mixins, length, i, mixin, calledMixins = {};
+			o.__initMixins__ = true;
+			while (p) {
+				p = supportsProto ? p.__proto__ : Object.getPrototypeOf(p);
+				if (p && p.hasOwnProperty("__mixins__") && (mixins = p.__mixins__) && (length = mixins.length))
+					for (i = 0; mixin = mixins[i], i < length; i++)
+						if (!(mixin in calledMixins)) {
+							calledMixins[mixin] = 1;
+							mixins[i].call(o, p, p.constructor);
+						}
+			}
+			delete o.__initMixins__;
 		}
 	};
 
