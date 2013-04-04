@@ -105,6 +105,8 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Scripts\Tests\FastClassTests.js" />
+    <Content Include="Scripts\Tests\qunit.css" />
     <Content Include="content\scripts\FastClass.min.js">
       <DependentUpon>FastClass.js</DependentUpon>
     </Content>
@@ -118,6 +120,8 @@
       <DependentUpon>jquery-1.9.1.js</DependentUpon>
     </Content>
     <Content Include="Scripts\NamespacesAndEnumSupport.js" />
+    <Content Include="Scripts\Tests\qunit.js" />
+    <Content Include="Scripts\Tests\Index.html" />
     <Content Include="Scripts\_references.js" />
     <Content Include="Scripts\_vs2012.intellisense.js" />
     <Content Include="Scripts\_vs2012.intellisense.Test.js" />
