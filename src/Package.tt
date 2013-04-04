@@ -25,7 +25,7 @@
     <frameworkAssemblies>
     </frameworkAssemblies>
     <references></references>
-    <tags>Javascript,prototype,inheritance,FastClass,fast,class</tags>
+    <tags>Javascript prototype inheritance FastClass fast class inheritWith inherit with define dotnetwise dnw</tags>
   </metadata>
   <files>
     <file src="lib\" target="lib" />
