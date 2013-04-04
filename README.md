@@ -122,12 +122,24 @@ This way we don't need to call `Function.initMixins(this)` as it will be automat
 var A = Function.define(function(name){
     this.name = name;
 }, {
-    draw: function() {
+    draw: function() {//method added on function(name) {}.prototype
         console.log("figure " + this.name);
     }
 }
 ```
-All of the above methods are doing the same thing.
+
+Alternatively you can pass an object with the costructor function specified (similar syntax to `.inheritWith`)
+```javascript
+var A = Function.define({
+    constructor: function(name) {//the constructor itself can be even missing. If so we will add one for you!
+        this.name = name;
+    },
+    draw: function() {//method added on constructor.prototype
+        console.log("figure " + this.name);
+    }
+}
+```
+All of the above methods are doing the same thing. You decide which one better suits you.
 
 ## Inheritance
 
