@@ -1,8 +1,19 @@
-﻿////For performance tests please see: http://jsperf.com/js-inheritance-performance/25
-/// <reference path="../../scripts/_vs2012.intellisense.js" />
-
+﻿////For performance tests please see: http://jsperf.com/js-inheritance-performance/34 + http://jsperf.com/js-inheritance-performance/35 + http://jsperf.com/js-inheritance-performance/36
 
 (function () {
+	///#DEBUG
+	window.WAssert = function(condition, message, arg1, arg2, argEtc) {
+		if (typeof message === "function")
+			message = message() || "";
+		if (!condition) {
+			var parameters = Array.prototype.slice.call(arguments, 1);
+			var msg = String.format.apply(message, parameters);
+			return window.console && console.assert && console.assert.bind && console.assert.bind(console, condition, msg) || function () { throw msg;};
+		}
+		return __;
+	};
+	///#ENDDEBUG
+
 	var Object_keys = Object.keys;
 	var Object_defineProperty = Object.defineProperty;
 	var Function_prototype = Function.prototype;
