@@ -63,7 +63,7 @@ var A = function(name) {
     draw: function() {
         console.log("figure "+ this.name);
     }
-}) 
+}/*, add any mixins here */) 
 ```
 
 The `define` function copies all the members of the returned object to the `function.prorortpe` *(`A.prototype`)* and returns it *(`A`)*
