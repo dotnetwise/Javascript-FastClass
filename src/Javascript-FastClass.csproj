@@ -105,7 +105,7 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Scripts\Tests\FastClassTests.js" />
+    <Content Include="Scripts\Tests\FastClass.Tests.js" />
     <Content Include="Scripts\Tests\qunit.css" />
     <Content Include="content\scripts\FastClass.min.js">
       <DependentUpon>FastClass.js</DependentUpon>

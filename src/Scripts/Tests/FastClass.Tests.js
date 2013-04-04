@@ -52,35 +52,42 @@ var D = C.inheritWith(function (base, baseCtor) {
 }, Point);
 
 var a = new A("a"), b = new B("b"), c = new C("c"), d = new D("d");
-test("a,b,c,d instanceof A", function () {
-	ok(a instanceof A, "a instanceof A should return true!");
-	ok(b instanceof A, "b instanceof A should return true!");
-	ok(c instanceof A, "c instanceof A should return true!");
-	ok(d instanceof A, "d instanceof A should return true!");
+
+test(".val should be the given argument i.e. a,b,c,d", function () {
+	equal(a.val, "a");
+	equal(b.val, "b");
+	equal(c.val, "c");
+	equal(d.val, "d");
 });
 test("a,b,c,d instanceof A", function () {
-	ok(a instanceof B == false, "a instanceof B should return false!");
-	ok(b instanceof B, "b instanceof B should return true!");
-	ok(c instanceof B, "c instanceof B should return true!");
-	ok(d instanceof B, "d instanceof B should return true!");
+	equal(a instanceof A, true, "a instanceof A should return true!");
+	equal(b instanceof A, true, "b instanceof A should return true!");
+	equal(c instanceof A, true, "c instanceof A should return true!");
+	equal(d instanceof A, true, "d instanceof A should return true!");
+});
+test("a,b,c,d instanceof A", function () {
+	equal(a instanceof B, false, "a instanceof B should return false!");
+	equal(b instanceof B, true, "b instanceof B should return true!");
+	equal(c instanceof B, true,"c instanceof B should return true!");
+	equal(d instanceof B, true, "d instanceof B should return true!");
 });
 test("a,b,c,d instanceof C", function () {
-	ok(a instanceof C == false, "a instanceof C should return false!");
-	ok(b instanceof C == false, "b instanceof C should return false!");
-	ok(c instanceof C, "c instanceof C should return true!");
-	ok(d instanceof C, "d instanceof C should return true!");
+	equal(a instanceof C, false, "a instanceof C should return false!");
+	equal(b instanceof C, false, "b instanceof C should return false!");
+	equal(c instanceof C, true, "c instanceof C should return true!");
+	equal(d instanceof C, true, "d instanceof C should return true!");
 });
 test("a,b,c,d instanceof D", function () {
-	ok(a instanceof D == false, "a instanceof D should return false!");
-	ok(b instanceof D == false, "b instanceof D should return false!");
-	ok(c instanceof D == false, "c instanceof D should return false!");
-	ok(d instanceof D, "d instanceof D should return true!");
+	equal(a instanceof D, false, "a instanceof D should return false!");
+	equal(b instanceof D, false, "b instanceof D should return false!");
+	equal(c instanceof D, false, "c instanceof D should return false!");
+	equal(d instanceof D, true, "d instanceof D should return true!");
 });
 test("mixin added to D", function () {
-	ok(typeof d.x === "function", "d.x should be a function from mixin Point");
-	ok(d.x() === 1, "d.x should return 1");
-	ok(d.x(3) === d, "d.x(3) should set d.point.x to 3 and return d");
-	ok(d.x() === 3, "d.x should return 3");
+	equal(typeof d.x, "function", "d.x should be a function from mixin Point");
+	equal(d.x(), 1, "d.x should return 1");
+	equal(d.x(3), d, "d.x(3) should set d.point.x to 3 and return d");
+	equal(d.x(), 3, "d.x should return 3");
 });
 test("multiple mixins adding same property should trigger an assert", function () {
 	raises(function () {
@@ -88,6 +95,13 @@ test("multiple mixins adding same property should trigger an assert", function (
 			this.constructor = function E() { }
 		}, Point, Point);
 	},
-	/The 'Point' mixin defines a 'function' named 'x' which is already defined on the class 'E'!/,
-	"adding same mixin twice should trigger an warning");
+	/The '(.+)' mixin defines a 'function' named '(.+)' which is already defined on the class ('E')?!/,
+		"adding same mixin twice should trigger an warning"
+	);
+});
+test("Function.define should automatically initialize mixins", function () {
+	var F = Function.define(function () {
+	}, {}, Point);
+	var f = new F();
+	equal(typeof f.x, "function", "Function.define(function() {}, {}, Point) should automatically initialize mixin Point");
 });

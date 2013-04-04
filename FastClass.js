@@ -46,7 +46,7 @@
 
 	var Function_prototype = Function.prototype;
 	var Array_prototype = Array.prototype;
-	var Array_prototype_forEach = Array_prototype_forEach;
+	var Array_prototype_forEach = Array_prototype.forEach;
 	var supportsProto = {};
 
 	supportsProto = supportsProto.__proto__ === Object.prototype;
@@ -101,12 +101,11 @@
 
 		var baseCtor = this;
 		var creatorResult = creator.call(this, this.prototype, this) || {};
-		var Derrived = creatorResult.constructor ||
-        function defaultCtor() {
-        	baseCtor.apply(this, arguments);
-        }; //automatic constructor if ommited
+		var Derrived = creatorResult.hasOwnProperty('constructor') ? creatorResult.constructor : function() {
+			baseCtor.apply(this, arguments);
+		}; //automatic constructor if ommited
 
-		WAssert(true, vs2012Intellisense && function () {
+		WAssert(true, window.vs2012Intellisense && function () {
 			//trigger intellisense on VS2012 when pressing F12 (go to reference) to go to the creator rather than the defaultCtor
 			intellisense.redirectDefinition(Derrived, creator);
 		});
@@ -126,8 +125,7 @@
 		/// <param name="mixins"  type="Function || Plain Object" optional="true" parameterArray="true">Specify one ore more mixins to be added to the derrived class. <br/>A Mixin is either a function which returns a plain object, or a plan object in itself. It contains method or properties to be added to this function's prototype</param>
 		var baseCtor = this;
 		var derrivedPrototype = creator.call(this, this.prototype, this) || {};
-		var Derrived = derrivedPrototype.constructor ||
-        function defaultCtor() {
+		var Derrived = derrivedPrototype.hasOwnProperty('constructor') ? derrivedPrototype.constructor : function () {
         	baseCtor.apply(this, arguments);
         }; //automatic constructor if ommited
 		Derrived.prototype = derrivedPrototype;
@@ -152,7 +150,7 @@
 				extendeePrototype[key] = prototype[key];
 		}
 		prototype = null;
-		arguments.length > 1 && (extendeePrototype.mixins = extendeePrototype.mixins || []) && Array_prototype_forEach.call(arguments, function (mixin, index, mixinValue, isFunction) {
+		(arguments.length > 2 || mixins) && (("__mixins__" in extendeePrototype) || Object.defineProperty(extendeePrototype, "__mixins__", { enumerable: false, value: [], writeable: false })) && Array_prototype_forEach.call(arguments, function (mixin, index, mixinValue, isFunction) {
 			isFunction = typeof mixin === 'function';
 			if (isFunction) {
 				__.prototype = mixin.prototype;
@@ -166,11 +164,12 @@
 						if (key in extendeePrototype) {
 							var msg = "The '{0}' mixin defines a '{1}' named '{2}' which is already defined on the class {3}!"
 								.format(isFunction && mixin.name || (index - 1), typeof mixinValue[key] === "function" ? "function" : "member", key, constructor.name ? ("'" + constructor.name + "'") : '');
+							console.log(msg)
 							window.vs2012Intellisense && intellisense.logMessage(msg);
 							throw msg;
 						}
 					});
-					isFunction && extendeePrototype.mixins.push(mixin);
+					isFunction && extendeePrototype.__mixins__.push(mixin);
 					extendeePrototype[key] = mixinValue[key];
 				}
 			}
@@ -202,7 +201,13 @@
 		prototype = null;
 		arguments.length > 1 && Function_prototype.define.apply(constructor, arguments);
 
-		result = function () { Function.initMixins(this); constructor.call(this); }
+		result = function () {
+			// automatically call initMixins and then the first constructor
+			Function.initMixins(this);
+			constructor.apply(this, arguments);
+		}
+		__.prototype = constructor.prototype;
+		result.prototype = new __;
 		//forward the VS2012 intellisense to the given constructor function
 		WAssert(true, window.vs2012Intellisense && function () {
 			intellisense.redirectDefinition(result, constructor);
@@ -214,7 +219,7 @@
 		var p = o, mixins, length, i, mixin, calledMixins = {};
 		while (p) {
 			p = supportsProto ? p.__proto__ : Object.getPrototypeOf(p);
-			if (p && (mixins = p.mixins) && (length = mixins.length))
+			if (p && p.hasOwnProperty("__mixins__") && (mixins = p.__mixins__) && (length = mixins.length))
 				for (i = 0; mixin = mixins[i], i < length; i++)
 					if (!(mixin in calledMixins)) {
 						calledMixins[mixin] = 1;
@@ -227,18 +232,33 @@
 
 ////Uncomment this for a quick demo & self test
 //////////////////OPTION 1: inheritWith////////////////////////
-//Using Define: 
-//function.define(proto) copies the given value from proto to Function_prototype
+////Using Define: 
+////Function.prototype.define(proto) copies the given value from proto to function.prototype i.e. A in this case
 
-//var A = function (val) {
+//////Aternative for Function.define we can do this:
+////var A = function (val) {
+////     Function.initMixins(this);// since this is a top function, we need to call initMixins to make sure they will be initialized.
+////	this.val = val;
+////}.define({
+////	method1: function (x, y, z) {
+////		this.x = x;
+////		this.y = y;
+////		this.z = z;
+////	}
+////});
+
+////To define the top level (first) function there is a sugar (as well as the above alternative)
+//var A = Function.define(function(val) {
+//     // when we are definin a top function with Function.define we DON'T need to call initMixins because they will be called automatically for us
 //	this.val = val;
-//}.define({
+//}, {
 //	method1: function (x, y, z) {
 //		this.x = x;
 //		this.y = y;
 //		this.z = z;
 //	}
 //});
+
 
 ////Follow derrivations using inheritWith
 
@@ -272,12 +292,26 @@
 
 //selfTest();
 
-////////////////////OPTION 2: fastClass////////////////////////
-////Using Define:
+//////////////////OPTION 2: fastClass////////////////////////
+//Using Define:
 
+////Aternative for Function.define we can do this:
 //var A = function (val) {
+//     Function.initMixins(this);// since this is a top function, we need to call initMixins to make sure they will be initialized.
 //	this.val = val;
 //}.define({
+//	method1: function (x, y, z) {
+//		this.x = x;
+//		this.y = y;
+//		this.z = z;
+//	}
+//});
+
+//To define the top level (first) function there is a sugar (as well as the above alternative)
+//var A = Function.define(function A(val) {
+//     // when we are definin a top function with Function.define we DON'T need to call initMixins because they will be called automatically for us
+//	this.val = val;
+//}, {
 //	method1: function (x, y, z) {
 //		this.x = x;
 //		this.y = y;
@@ -288,26 +322,26 @@
 
 ////Follow derrivations using fastClass
 //var B = A.fastClass(function (base, baseCtor) {
-//	this.constructor = function (val) { baseCtor.call(this, val) };
+//	this.constructor = function B(val) { baseCtor.call(this, val) };
 //	this.method1 = function (y, z) {
 //		base.method1.call(this, 'x', y, z);
 //	}
 //});
 //var C = B.fastClass(function (base, baseCtor) {
-//	this.constructor = function (val) { baseCtor.call(this, val) };
+//	this.constructor = function C(val) { baseCtor.call(this, val) };
 //	this.method1 = function (z) {
 //		base.method1.call(this, 'y', z);
 //	};
 //});
 
 //var D = C.fastClass(function (base, baseCtor) {
-//	this.constructor = function (val) { baseCtor.call(this, val) };
+//	this.constructor = function D(val) { baseCtor.call(this, val) };
 //	this.method1 = function (z) {
 //		base.method1.call(this, z);
 //	};
 //});
 
-//selfTest();
+////selfTest();
 
 //function selfTest() {
 //	window.a = new A("a");
@@ -358,3 +392,32 @@
 //	}
 //}
 //console.log("If there are no asserts in the console then all tests have passed! yey :)")
+
+////defining a mixin
+//var Point = function Point() {
+//	this.point = { x: 1, y: 2 };
+//}.define({
+//	x: function x(x) {
+//		/// <param name="x" optional="true">Specify a value to set the point.x. Don't specify anything will retrieve point.x</param>
+//		return arguments.length ? (this.point.x = x) && this || this : this.point.x;
+//	},
+//	y: function y(y) {
+//		/// <param name="y" optional="true">Specify a value to set the point.y. Don't specify anything will retrieve point.y</param>
+//		return arguments.length ? (this.point.y = y) && this || this : this.point.y;
+//	}
+//});
+
+////referencing the mixin:
+//var E = D.inheritWith(function (base, baseCtor) {
+//	return {
+//		//no constructor !! - it will be added automatically for us
+//		method1: function (z) {
+//			base.method1.call(this, z);
+//		}
+//	};
+//}, Point//specifying zero or more mixins - comma separated
+//);
+
+//var e = new B();
+//e.x(2);//sets e.point.x to 2
+//console.log("mixin Point.x expected to return 2. Actual: ", e.x());//returns 2
