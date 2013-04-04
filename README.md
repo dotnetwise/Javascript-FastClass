@@ -8,48 +8,53 @@ A faster and easier way to define Javascript Prototypal Inheritance: `classes` a
 *  <a href="http://jsperf.com/js-inheritance-performance/35" target="_blank"><code>Fastest libraries define + usage</code></a> - 3 classes and 3 methods * 500 instances each
 *  <a href="http://jsperf.com/js-inheritance-performance/34" target="_blank"><code>Fastest libraries define only</code></a> - 3 classes and 3 methods * 1 instances each
 
-## Sugar syntax
+## Syntactic sugar
 ```javascript
-var Vehicle = Function.define(function(name)){
+var Vehicle = Function.define(function(name)){//define the "base class"
     this.name = name;//constructor initializer
-}, { //optionally specify  prototype members
+}, { //optionally specify  prototype members i.e. to be added on Vechicle.prototype
     draw: function() { console.log("Drawing a " + this.name + " vehicle."); }
 });//optionally specify extra mixins i.e. , Wheels);
 
-var Car = Vechicle.inheritWith(function(base, baseCtor)){
+var Car = Vechicle.inheritWith(function(base, baseCtor)){//define the "derrived class"
     return { //optionally specify  prototype members
-        constructor: function(name, color) { //optionally specify a custom construcor and ansure you are calling the baseCtor
-            baseCtor.call(this, name);
+        constructor: function(name, color) { //optionally specify a custom construcor
+            baseCtor.call(this, name);//ensure you are calling the baseCtor
             this.color = color;
         },
-        draw: function() { //redefine the draw function
+        draw: function() { //redefine the draw function on Car.prototype
             console.log("Drawing a "+this.color+" car."); 
             base.draw.call(this);//optionally call the base class' draw method
         }
     }
-}, Engine);//optionally specify extra mixins
+}, Engine);//optionally specify extra mixins whose prortotype members will be copied to Car.prototype
 
 //Define the Engine mixin
-function Engine() {//this constructor will be automatically called when creating any class who is using it. i.e. new Car()
-    this.powerSource = 'petrol';
-    this.cmc = 1400;
+function Engine() {
+    //this constructor will be automatically called when creating any class using it 
+    //(including derrived classes). i.e. new Car() in this example    
+    this.powerSource = 'petrol';//these properties will be added to every Car instance
+    this.cmc = 1400;// i.e. var c= new Car(); c.cmc = 1400
     this.horsePower = 140;
 }.define({//optioanlly add custom methods on Engine.prototype mixin
-    isElectric: function() { return this.pwerSource === 'electric'; }//this willb e copied to Car.prototype in our example
+    //these will be copied to Car.prototype in our example, baecause it references the Engine mixin
+    isElectric: function() { return this.pwerSource === 'electric'; }
 })
 
-var toyota = new Car("toyota prius", "red");
-toyota.powerSource = 'electric'; //proerty 
+var toyota = new Car("toyota prius", "red");//creating a new Car
+toyota.powerSouce; //petrol
+toyota.powerSource = 'electric'; //changing the powerSource proerty 
 toyota.isElectric();//returns true
 toyota.draw(); 
 //Drawing a red car. 
 //Drawing a tyota prius vechicle.
 ```
+
+## Why yet another library?
 <div align="center">
 <img src="../../wiki/images/NugetIcon.png"/>
 </div>
 
-## Why yet another library?
 Native javascript inheritance is a pin in the ass. Even if you understand it perfectly it still requires some hideous repetivie code.
 
 There are a lot of libraries which aim to help you with such that, but the main question is:
@@ -57,14 +62,17 @@ There are a lot of libraries which aim to help you with such that, but the main 
 What is <a href="http://jsperf.com/js-inheritance-performance/36" target="_blank"><code>the fastest</code></a> vs <a target="_blank" href="https://github.com/njoubert/inheritance.js/blob/master/INHERITANCE.md"><code>most convenient</code></a> (also known as: with the most `[sugar](http://en.wikipedia.org/wiki/Syntactic_sugar)`) to create <a href="http://msdn.microsoft.com/en-us/magazine/ff852808.aspx" target="_blank"><code>Prototypal Inheritance</code></a> with?
 
 ## When to use it?
-You do need this library when you can't use a language that <a href="https://github.com/jashkenas/coffee-script/wiki/List-of-languages-that-compile-to-JS" target="_blank"><code>compiles</code></a> into javascript code.
+You might want this library
+* when you can't use a language that <a href="https://github.com/jashkenas/coffee-script/wiki/List-of-languages-that-compile-to-JS" target="_blank"><code>compiles</code></a> into javascript code.
+* because it is fast 
+* you love `writing less - doing more!`
 
 e.g. <a href="https://developers.google.com/closure/" target="_blank">Google Closure</a>, <a href="http://www.typescriptlang.org/Playground/" target="_blank">TypeScript</a>, <a href="http://arcturo.github.com/library/coffeescript/03_classes.html" target="_blank">Coffee Script</a> etc.
 
 ## What is it? 
-FastClass is a very tiny library (~0.7KB minified and gzipped) that helps you quickly derrive your `classes` so to speak. 
+FastClass is a very tiny library (~1KB minified and gzipped) that helps you quickly derrive your `classes` so to speak. 
 It comes in two flavours:
-* [`Function.prototype.fastClass(creator)`](#fastclass-flavour) - sets the `Base.prototype` to the `creator` function
+* [`Function.prototype.fastClass(creator)`](#fastclass-flavour) - sets the `Base.prototype` to the `creator` function and then calls `new creator(this.prototype, this)`
 ```javascript
 function(base, baseCtor) { this.somePrototypeMethod1 =  ...; this.somePrototypeMethod2 =  ...; } }
 ```
@@ -79,12 +87,14 @@ function(base, baseCtor) { return { somePrototypeMethod1: ..., somePrototypeMeth
 ```
 whereas `baseCtor` is the function we want to inherit and base is it's prototype *(`baseCtor.prototype` that is).*
 
+
 ## How to use it?
 
-### The base "class"
+### Defining the base "class"
 ```javascript
 var Figure = function(name) {
     this.name = name;
+    Function.initMixins(this);// since this is a top function, we need to call initMixins to make sure they will be initialized.
 }
 Figure.prototype.draw = function() { console.log("figure " + name); }
 ```
@@ -96,6 +106,7 @@ You can define the first `class' constructor function` (same as above but with s
 ```javascript
 var A = function(name) { 
     this.name = name; 
+    Function.initMixins(this);// since this is a top function, we need to call initMixins to make sure they will be initialized.
 }.define({
     draw: function() {
         console.log("figure "+ this.name);
@@ -105,6 +116,18 @@ var A = function(name) {
 
 The `define` function copies all the members of the returned object to the `function.prorortpe` *(`A.prototype`)* and returns it *(`A`)*
 
+### `Function.define` even better sugar - **recommended**
+This way we don't need to call `Function.initMixins(this)` as it will be automatically called for us
+```javascript
+var A = Function.define(function(name){
+    this.name = name;
+}, {
+    draw: function() {
+        console.log("figure " + this.name);
+    }
+}
+```
+All of the above methods are doing the same thing.
 
 ### Inheritance
 
@@ -171,7 +194,12 @@ figure.draw();
 
 You can <a href="http://programmers.stackexchange.com/questions/123342/inheritance-vs-mixins-in-dynamic-languages" target="_blank">learn more</a> about `mixins` vs `inheritance` on <a href="http://programmers.stackexchange.com/questions/123342/inheritance-vs-mixins-in-dynamic-languages" target="_blank">this post</a>.
 
-#### Example
+We can define mixins as 
+* an `object` containing functions
+* a `function` which will be executed for every instance of the class that is using it
+    * The `prototype` of the function will be automatically copied to the `class.prototype` that are using it
+
+### Another Example
 
 ```javascript
 // Animal base class
@@ -183,40 +211,42 @@ function Animal() {
     // Privileged - on instance
     this.privileged1 = function(){}
     this.privileged2 = function(){}
+    Function.initMixins(this);
 }.define({ 
     // Public - on prototype
-    method1: function(){}
+    method1: function() { console.log("Animal::method1"); }
 });
 ```
 
 Alternatively the above can be defined as:
 ```javascript
-var Animal = Function.fastClass(function(){
+var Animal = Function.define(function(){
     // Private 
     function private1() {}
     function private2() {}
-    return {
-        constructor: function() {
-            // Privileged - on instance
-            this.privileged1 = function(){}
-            this.privileged2 = function(){}
-        },
+     // Privileged - on instance
+    this.privileged1 = function(){}
+    this.privileged2 = function(){}
+    }, {
         method1: function() { console.log("Animal::method1"); }
     };
 });
 ```
 
-The `function Animal` method acts as the constructor, which is invoked when an instance is created:
+The `function Animal` is the `function` given as first parameter. 
+It acts as the constructor, which is invoked when an instance is created:
 
 ```javascript
 var animal = new Animal(); // Create a new Animal instance
 ```
 
-### Mixins
+### Spicing it up with inheritance and mixins
 
 We can typically define a `move` action which is a set of methods grouped in our `Move mixin`
+
+#### Defining the mixin
 ```javascript
-function move() {//define the constructor of the mixin. This will be automatically called for every instance in the constructor of the class that is using this mixin
+function Move() {//define the constructor of the mixin. This will be automatically called for every instance in the constructor of the class that is using this mixin
     this.position = { x: 0, y: 0};
 }.define({//define mixin's prototype. These will be copied to the prototype of the classes that will use this `mixin`
    moveTo: function(x, y) {
@@ -233,7 +263,7 @@ function move() {//define the constructor of the mixin. This will be automatical
 });
 ```
 
-### Inheritance
+### Adding Inheritance and using the `Move mixin`
 
 #### Usage using `.inheritWith` flavour
 
@@ -259,7 +289,7 @@ var Dog = Animal.inheritWith(function(base, baseCtor) {
         //some new public method(s)
         method2: function() { }
     }
-}, move);//specify any extra mixins to be added to the Dog's prototype
+}, Move);//specify any extra mixins to be added to the Dog's prototype
 ```
 
 Create an instance of `Dog`:
@@ -313,7 +343,7 @@ var Dog = Animal.fastClass(function(base, baseCtor) {
     };
     //some more public functions
     this.method2 = function() {}; 
-});
+}, Move);
 ```
 
 ## Where to get it from?
