@@ -11,6 +11,43 @@ A faster and easier way to define Javascript Prototypal Inheritance: `classes` a
 <div align="center">
 <img src="../../wiki/images/NugetIcon.png"/>
 </div>
+## Sugar syntax
+```javascript
+var Vehicle = Function.define(function(name)){
+    this.name = name;//constructor initializer
+}, { //optionally specify  prototype members
+    draw: function() { console.log("Drawing a " + this.name + " vehicle."); }
+});//optionally specify extra mixins i.e. , Wheels);
+
+var Car = Vechicle.inheritWith(function(base, baseCtor)){
+    return { //optionally specify  prototype members
+        constructor: function(name, color) { //optionally specify a custom construcor and ansure you are calling the baseCtor
+            baseCtor.call(this, name);
+            this.color = color;
+        },
+        draw: function() { //redefine the draw function
+            console.log("Drawing a "+this.color+" car."); 
+            base.draw.call(this);//optionally call the base class' draw method
+        }
+    }
+}, Engine);//optionally specify extra mixins
+
+//Define the Engine mixin
+function Engine() {//this constructor will be automatically called when creating any class who is using it. i.e. new Car()
+    this.powerSource = 'petrol';
+    this.cmc = 1400;
+    this.horsePower = 140;
+}.define({//optioanlly add custom methods on Engine.prototype mixin
+    isElectric: function() { return this.pwerSource === 'electric'; }//this willb e copied to Car.prototype in our example
+})
+
+var toyota = new Car("toyota prius", "red");
+toyota.powerSource = 'electric'; //proerty 
+toyota.isElectric();//returns true
+toyota.draw(); 
+//Drawing a red car. 
+//Drawing a tyota prius vechicle.
+```
 
 ## Why yet another library?
 Native javascript inheritance is a pin in the ass. Even if you understand it perfectly it still requires some hideous repetivie code.
