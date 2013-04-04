@@ -288,7 +288,6 @@ Install-Package Javascript-FastClass
 ## What's next?
 * [Private methods support!](../../wiki/Private-Methods)
 * [Self test](../../wiki/Self-Test)
-* Mixins - to be added
 
 Do you have a better & faster way? Share it! We would love to seeing creativity in action!
 
