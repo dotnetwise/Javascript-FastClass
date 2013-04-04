@@ -191,14 +191,26 @@
 
 
 	Function.define = function (func, prototype, mixins) {
+		/// <signature>
 		/// <summary>Extends the given func's prototype with provided members of prototype and ensures calling the mixins in the constructor</summary>
 		/// <param name="func" type="Function">Specify the constructor function you want to define i.e. function() {}</param>
 		/// <param name="prototype" type="Plain Object" optional="true">Specify an object that contain the functions or members that should defined on the provided func's prototype</param>
 		/// <param name="mixins"  type="Function || Plain Object" optional="true" parameterArray="true">Specify one ore more mixins to be added to the returned func's prototype. <br/>A Mixin is either a function which returns a plain object, or a plan object in itself. It contains method or properties to be added to this function's prototype</param>
+		/// </signature>
+		/// <signature>
+		/// <summary>Extends the given constructor's prototype with provided members of prototype and ensures calling the mixins in the constructor</summary>
+		/// <param name="prototype" type="Plain Object">Specify an object that contain the constructor and functions or members that should defined on the provided constructor's prototype</param>
+		/// <param name="mixins"  type="Function || Plain Object" optional="true" parameterArray="true">Specify one ore more mixins to be added to the returned func's prototype. <br/>A Mixin is either a function which returns a plain object, or a plan object in itself. It contains method or properties to be added to this function's prototype</param>
+		/// </signature>
 		var result;
 		var constructor = func || function () { }; //automatic constructor if ommited
-		func = prototype;
-		prototype = null;
+		if (typeof func !== "function") {
+			constructor = func.constructor || function () {};
+		}
+		else {
+			func = prototype;
+			prototype = null;
+		}
 		arguments.length > 1 && Function_prototype.define.apply(constructor, arguments);
 
 		result = function () {

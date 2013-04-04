@@ -104,4 +104,18 @@ test("Function.define should automatically initialize mixins", function () {
 	}, {}, Point);
 	var f = new F();
 	equal(typeof f.x, "function", "Function.define(function() {}, {}, Point) should automatically initialize mixin Point");
+	f.x(10);
+	equal(f.point.x, 10);
+});
+test("Function.define with an object", function () {
+	var F = Function.define({
+		constructor: function (abc) {
+			this.abc = abc;
+		}
+	}, {}, Point);
+	var f = new F("abc");
+	equal(typeof f.x, "function", "Function.define(function() {}, {}, Point) should automatically initialize mixin Point");
+	equal(f.abc, "abc");
+	f.x(20);
+	equal(f.x(), 20);
 });
