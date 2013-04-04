@@ -2,7 +2,16 @@
 
 (function () {
 	///#DEBUG
-	window.WAssert = function(condition, message, arg1, arg2, argEtc) {
+	window.WAssert = function (condition, message, arg1, arg2, argEtc) {
+		/// <summary>Returns an `assert function` if the condition is false an a `noop function` (a function which does nothing) if the condition is true. <br/>
+		///  WAsserts will not be included in production code in anyways, hence the minifier will remove all the WAssert calls<br/><br/>
+		///  You always need to call the WAssert function twice since the first call always returns a function i.e. WAssert(false, "{0} failed", "Condition")()
+		/// </summary>
+		/// <param name="condition" type="Boolean">The condition to be tested. It should be true so nothing happens</param>
+		/// <param name="message" type="String || Function">The message to be asserted. If passed a function it will be evaluated all the times, regardless of the condition</param>
+		/// <param name="arg1" type="Object" optional="true">First argument to replace all of the {0} occurences from the message</param>
+		/// <param name="arg2" type="Object" optional="true">Second argument to replace all of the {1} occurences from the message</param>
+		/// <param name="argEtc" type="Object" optional="true" parameterArray="true">Third argument to replace all of the {3} occurences from the message.<br/> You can add as many arguments as you want and they will be replaced accordingly</param>
 		if (typeof message === "function")
 			message = message() || "";
 		if (!condition) {
@@ -39,6 +48,7 @@
 			}
 		}
 	}
+	
 	Function_prototype.fastClass = function (creator, mixins) {
 		/// <summary>Inherits the function's prototype to a new function named constructor returned by the creator parameter</summary>
 		/// <param name="creator" type="Function">function(base, baseCtor) { this.constructor = function() {..}; this.method1 = function() {...}... }<br/>where base is BaseClass.prototype and baseCtor is BaseClass - aka the function you are calling .fastClass on</param>
