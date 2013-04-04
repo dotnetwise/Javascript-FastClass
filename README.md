@@ -1,6 +1,6 @@
 Javascript-fastClass
 ====================
-A faster and easier Javascript Inheritance 
+A faster and easier way to define Javascript Prototypal Inheritance: `classes` and `mixins`
 
 
 ## Performance tests
@@ -13,26 +13,26 @@ A faster and easier Javascript Inheritance
 </div>
 
 ## Why yet another library?
-Native Javascript Inheritance is a pin in the ass. Even if you understand it perfectly it still requires some hideous repetivie code.
+Native javascript inheritance is a pin in the ass. Even if you understand it perfectly it still requires some hideous repetivie code.
 
-There are a lot of libraries which aims to help you with such that, but the main question is:
+There are a lot of libraries which aim to help you with such that, but the main question is:
 
-What is <a href="http://jsperf.com/js-inheritance-performance/36" target="_blank"><code>the fastest</code></a> vs <a target="_blank" href="https://github.com/njoubert/inheritance.js/blob/master/INHERITANCE.md"><code>most convenient</code></a> to create <a href="http://msdn.microsoft.com/en-us/magazine/ff852808.aspx" target="_blank"><code>Prototypal Inheritance</code></a> with?
+What is <a href="http://jsperf.com/js-inheritance-performance/36" target="_blank"><code>the fastest</code></a> vs <a target="_blank" href="https://github.com/njoubert/inheritance.js/blob/master/INHERITANCE.md"><code>most convenient</code></a> (also known as: with the most `[sugar](http://en.wikipedia.org/wiki/Syntactic_sugar)`) to create <a href="http://msdn.microsoft.com/en-us/magazine/ff852808.aspx" target="_blank"><code>Prototypal Inheritance</code></a> with?
 
 ## When to use it?
-You do need this library when you can't use a language that <a href="https://github.com/jashkenas/coffee-script/wiki/List-of-languages-that-compile-to-JS" target="_blank"><code>compiles</code></a> into javascript.
+You do need this library when you can't use a language that <a href="https://github.com/jashkenas/coffee-script/wiki/List-of-languages-that-compile-to-JS" target="_blank"><code>compiles</code></a> into javascript code.
 
 e.g. <a href="https://developers.google.com/closure/" target="_blank">Google Closure</a>, <a href="http://www.typescriptlang.org/Playground/" target="_blank">TypeScript</a>, <a href="http://arcturo.github.com/library/coffeescript/03_classes.html" target="_blank">Coffee Script</a> etc.
 
 ## What is it? 
-FastClass is a very tiny library (~0.6KB minified and gzipped) that helps you quickly derrive your `classes` so to speak. 
+FastClass is a very tiny library (~0.7KB minified and gzipped) that helps you quickly derrive your `classes` so to speak. 
 It comes in two flavours:
 * [`Function.prototype.fastClass(creator)`](#fastclass-flavour) - sets the `Base.prototype` to the `creator` function
 ```javascript
 function(base, baseCtor) { this.somePrototypeMethod1 =  ...; this.somePrototypeMethod2 =  ...; } }
 ```
 
-* [`Function.prototype.inheritWith(creator)`](#inheritwith-flavour) - **recommended**. 
+* [`Function.prototype.inheritWith(creator)`](#inheritwith-flavour) - **recommended** returns a `plain object` containing the members of the new prototype, including the constructor itself
 
 It makes usage of __proto__ on all new browsers (which makes it blazing fast) except `Internet Explorer` and maybe other ancient browsers where it fallbacks to `for (var key in obj)` statement.
 
@@ -51,6 +51,25 @@ var Figure = function(name) {
 }
 Figure.prototype.draw = function() { console.log("figure " + name); }
 ```
+
+### `.define` sugar
+
+You can define the first `class' constructor function` (same as above but with sugar syntax) as following:
+
+```javascript
+var A = function(name) { 
+    this.name = name; 
+}.define({
+    draw: function() {
+        console.log("figure "+ this.name);
+    }
+}/*, add any mixins here */) 
+```
+
+The `define` function copies all the members of the returned object to the `function.prorortpe` *(`A.prototype`)* and returns it *(`A`)*
+
+
+### Inheritance
 
 A classical example to use inheritance when you have a base class called `Figure` and a derrived class called `Square`.
 
@@ -110,7 +129,10 @@ figure.draw();
 //figure 10cm square
 ```
 
-## Another clasical example
+## Mixins support
+<a href="http://www.joezimjs.com/javascript/javascript-mixins-functional-inheritance/" target="_blank">Mixins</a> are some grouped functionalities that you can add to a `class` without inheritance
+
+You can <a href="http://programmers.stackexchange.com/questions/123342/inheritance-vs-mixins-in-dynamic-languages" target="_blank">learn more</a> about `mixins` vs `inheritance` on <a href="http://programmers.stackexchange.com/questions/123342/inheritance-vs-mixins-in-dynamic-languages" target="_blank">this post</a>.
 
 #### Example
 
@@ -142,7 +164,7 @@ var Animal = Function.fastClass(function(){
             this.privileged1 = function(){}
             this.privileged2 = function(){}
         },
-        method1: function() {}
+        method1: function() { console.log("Animal::method1"); }
     };
 });
 ```
@@ -153,13 +175,34 @@ The `function Animal` method acts as the constructor, which is invoked when an i
 var animal = new Animal(); // Create a new Animal instance
 ```
 
+### Mixins
+
+We can typically define a `move` action which is a set of methods grouped in our `Move mixin`
+```javascript
+function move() {//define the constructor of the mixin. This will be automatically called for every instance in the constructor of the class that is using this mixin
+    this.position = { x: 0, y: 0};
+}.define({//define mixin's prototype. These will be copied to the prototype of the classes that will use this `mixin`
+   moveTo: function(x, y) {
+       this.position.x = x;
+       this.position.y = y;
+   },
+   resetPosition: function() {
+       this.position.x = 0; 
+       this.position.y = 0;
+   },
+   logPosition: function() {
+       console.log("Position: ", this.position);
+   }
+});
+```
+
 ### Inheritance
 
-#### Usage
+#### Usage using `.inheritWith` flavour
 
-`[[constructor]].inheritWith( function(base, baseCtor) { return {...} } )` - that function should `return` methods for the derrived prototype
+`[[constructor]].inheritWith( function(base, baseCtor) { return {...} }, mixins )` - that function should `return` methods for the derrived prototype
 
-
+#### Example
 ```javascript
 // Extend the Animal class with inheritWith flavor
 var Dog = Animal.inheritWith(function(base, baseCtor) {
@@ -170,7 +213,8 @@ var Dog = Animal.inheritWith(function(base, baseCtor) {
         // Override base class `method1`
         method1: function(){
             someOtherPrivateMethod.call(this);
-            console.log('dog::method1');
+            base.method1.call(this);//calling a methd from the base class: Animal.prtotype.method1
+            console.log('Dog::method1');
         },
         scare: function(){
             console.log('Dog::I scare you');
@@ -178,22 +222,38 @@ var Dog = Animal.inheritWith(function(base, baseCtor) {
         //some new public method(s)
         method2: function() { }
     }
-});
+}, move);//specify any extra mixins to be added to the Dog's prototype
 ```
 
 Create an instance of `Dog`:
 
 ```javascript
 var husky = new Dog();
-husky.scare(); // "Dog::I scare you'"
+husky.method1(); 
+// Animal::method1
+// Dog::method1
+
+husky.scare();
+// Dog::I scare you'
+
+
+/// testing the mixin:
+husky.logPosition(); // Call the method of the mixin. 
+// Position: {x: 0, y: 0}
+
+husky.moveTo(10, 20);  
+husky.logPosition();
+// Position: {x: 10, y: 20}
+
+husky.resetPosition();
+husky.logPosition();
+// Position: {x: 0, y: 0}
 ```
 
-#### Accessing parent prototype
+#### Same as above using `.fastClass` flavour
 
-#### Usage
-
-`[[constructor]].inheritWith( function(base, baseCtor) { this.m = function {...} ... } )` - that function `populates` the derrived prototype
-Every class definition has access to the parent's prototype via the first argument passed into the function. The second argument is the base Class itself (constructor):
+`[[constructor]].fastClass( function(base, baseCtor) { this.m = function {...} ... } )` - that function `populates` the derrived prototype
+Every class definition has access to the parent's prototype via the first argument passed into the function. The second argument is the `base Class` itself (its constructor i.e. `Animal` in our case):
 
 ```javascript
 // Same as above but Extend the Animal class using fastClass flavor
@@ -209,30 +269,15 @@ var Dog = Animal.fastClass(function(base, baseCtor) {
         someOtherPrivateMethod.call(this);
         // Call the parent function
         base.method1.call(this);
+        console.log('Dog::method1');
     };
     this.scare = function(){
         console.log('Dog::I scare you');
     };
     //some more public functions
-    this.method2 = function() {};
+    this.method2 = function() {}; 
 });
 ```
-
-### First `definition` 
-You can hdefine the first `class' constructor function` as following:
-
-```javascript
-var A = function(name) { 
-    this.name = name; 
-}.define({
-    draw: function() {
-        console.log("figure "+ this.name);
-    }
-}) 
-```
-
-The `define` function copies all the members of the returned object to the `function.prorortpe` *(`A.prototype`)* and returns it *(`A`)*
-
 
 ## Where to get it from?
 Beside GitHub, you can download it as a <a href="http://nuget.org/packages/Javascript-FastClass/" target="_blank"><code>Nuget package</code></a> in Visual Studio from<a href="http://nuget.org/packages/Javascript-FastClass/" target="_blank"><code>here</code></a>
@@ -243,7 +288,6 @@ Install-Package Javascript-FastClass
 ## What's next?
 * [Private methods support!](../../wiki/Private-Methods)
 * [Self test](../../wiki/Self-Test)
-* Mixins - to be added
 
 Do you have a better & faster way? Share it! We would love to seeing creativity in action!
 
