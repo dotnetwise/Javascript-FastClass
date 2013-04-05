@@ -38,7 +38,7 @@
 		if (!trueishCondition) {
 			var parameters = Array.prototype.slice.call(arguments, 1);
 			var msg = typeof message == "string" ? String.format.apply(message, parameters) : message;
-			return window.console && console.assert && console.assert.bind && console.assert.bind(console, trueishCondition, msg) || function consoleAssertThrow() { throw msg; };
+			return window.console && !console.__throwErrorOnAssert && console.assert && console.assert.bind && console.assert.bind(console, trueishCondition, msg) || function consoleAssertThrow() { throw msg; };
 		}
 		return __;
 	};
@@ -135,7 +135,6 @@
 
 		return Derrived;
 	};
-
 	Function_prototype.define = function define(prototype, mixins) {
 		/// <summary>Define members on the prototype of the given function with the custom methods and fields specified in the prototype parameter.</summary>
 		/// <param name="prototype" type="Function || Plain Object">{} or function(prototype, ctor) {}<br/>A custom object with the methods or properties to be added on Extendee.prototype</param>
@@ -272,6 +271,33 @@
 			this[i] = copyPropertiesFrom[i];
 		}
 		return this;
+	}
+	function defaultAbstractMethod() {
+		WAssert(false, "Not implemented")();
+	}
+	defaultAbstractMethod.defineStatic({abstract:true});
+	Function.abstract = function (message, func) {
+		/// <summary>Returns an abstract function that asserts the given message. Optionally you can add some code to happen before assertion too</summary>
+		/// <param name="message" type="String || Function">The message to be thrown when the newly method will be called. <br/>Defaults to: Not implemented</param>
+		/// <param name="func" type="Function" optional="true">Specify a custom function to be called before the assertion is thrown.</param>
+		var result = message || func ? function () {
+			if (typeof message === "function")
+				message.apply(this, arguments);
+			if (typeof func === "function")
+				func.apply(this, arguments);
+			if (typeof message === "string")
+				WAssert(false, message)();
+			else defaultAbstractMethod();
+		}.defineStatic({ abstract: true }) : defaultAbstractMethod;
+		WAssert(true, window.vs2012Intellisense && function () {
+			if (result != defaultAbstractMethod) {
+				if (typeof message === "function")
+					intellisense.redirectDefinition(result, message);
+				if (typeof func === "function")
+					intellisense.redirectDefinition(result, func);
+			}
+		});
+		return result;
 	}
 
 	Function.initMixins = function initMixins(objectInstance) {

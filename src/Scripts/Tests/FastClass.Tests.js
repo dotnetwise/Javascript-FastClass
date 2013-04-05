@@ -53,7 +53,7 @@ var D = C.inheritWith(function (base, baseCtor) {
 }, Point);
 
 var a = new A("a"), b = new B("b"), c = new C("c"), d = new D("d");
-
+console.__throwErrorOnAssert = true;
 test(".val should be the given argument i.e. a,b,c,d", function () {
 	equal(a.val, "a");
 	equal(b.val, "b");
@@ -167,7 +167,7 @@ test("Function.define should create mixins the same way as function(){}.define({
 	equal(f.isWhite(), true);//comes from Color.prototype
 });
 
-test("Function.defineStatic should define static members on the given function", function () {
+test("Function.prototype.defineStatic should define static members on the given function", function () {
 	var F = Function.define({
 		constructor: function F(abc) {
 			this.abc = abc;
@@ -179,10 +179,47 @@ test("Function.defineStatic should define static members on the given function",
 		a: 1,
 		b: undefined
 	});
-	
+
 	var f = new F("abc");
 	equal(typeof F.m, "function");
 	equal(F.m(), "m");
 	equal(F.a, 1);
 	equal("b" in F, true);
+});
+test("Function.abstract should define an abstract function that throw an exception when called", function () {
+	raises(function () { Function.abstract("To be implemented")(); },
+		/To be implemented/,
+		"When calling with a custom message should assert.fail with the provided message"
+	);
+	raises(function () { Function.abstract()(); },
+		/Not implemented/,
+		"When calling with a no message should assert.fail with the default message: Not implemented"
+	);
+	var F = Function.define({
+		method: Function.abstract(function () {
+			this.abc = 1;
+		})
+	});
+	var f = new F();
+	raises(function () {
+		f.method();
+	},
+		/Not implemented/,
+		"When calling with a no message should assert.fail with the default message: Not implemented"
+	);
+	equal(f.abc, 1, "Ensure the custom function was called");
+	var F = Function.define({
+		method: Function.abstract("Custom message", function () {
+			this.abc = 1;
+		})
+	});
+	var f = new F();
+	raises(function () {
+		f.method();
+	},
+		/Custom message/,
+		"When calling with a no message should assert.fail with the default message: Not implemented"
+	);
+	equal(f.abc, 1, "Ensure the custom function was called");
+	equal(F.prototype.method.abstract, true, "The function should have static member abstract = true");
 });
