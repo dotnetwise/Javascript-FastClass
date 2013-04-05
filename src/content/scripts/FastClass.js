@@ -168,6 +168,9 @@
 						WAssert(true, function WAssertInjecting() {
 							//trigger intellisense on VS2012 for mixins
 							if (key in extendeePrototype) {
+								//allow abastract members on class/mixins so they can be replaced
+								if (extendeePrototype[key] && extendeePrototype[key].abstract)
+									return;
 								var msg = "The '{0}' mixin defines a '{1}' named '{2}' which is already defined on the class {3}!"
 									.format(isFunction && mixin.name || (index - 1), typeof mixinValue[key] === "function" ? "function" : "member", key, constructor.name ? ("'" + constructor.name + "'") : '');
 								console.log(msg)
