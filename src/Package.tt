@@ -12,9 +12,11 @@
     <owners>DotNetWise</owners>
     <releaseNotes>
       Fixed defining mixins with Function.define({
-        constructor: function() {
-        }
+        constructor: function() {},
+        method: function() {}
       });
+      Fixed intellisense
+      Added unit-tests
     </releaseNotes>
     <summary>
     </summary>
