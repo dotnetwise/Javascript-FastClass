@@ -14,23 +14,13 @@
 	});
 	intellisense.addEventListener('statementcompletion', function (e) {
 		e.items.forEach(function (item) {
-			if (item.name == "a") {
-				//intellisense.logMessage("before:" + JSON.stringify(item));
-				item.kind = "method";
-				item["_$group"] = 0xff;
-				item.Group = 0xff;
-				item.glyph = "vs:GlyphGroupValueType";
-				//item.scope = "member";
-				//item.comments = "abc";
-				//delete item["_$fileId"];
-				//delete item["_$pos"];
-				//intellisense.logMessage("after:" + JSON.stringify(item));
-				return;
-			}
 			var value = item.value,
 				parentObject = item.parentObject,
 				kind = item.kind;
-			if (typeof value === "number") {
+			if (value && typeof value.__glyph === "string") {
+				item.glyph = value.__glyph.index(":") >= 0 ? value.__glyph : "vs:" + value.__glyph;
+			}
+			else if (typeof value === "number") {
 				item.kind = "field";
 				item.glyph = 'vs:GlyphGroupValueType';
 			} else if (typeof value === "string") {
@@ -151,6 +141,8 @@
 
 		});
 		e.items = e.items.filter(function (item) {
+			if (item.value && item.value.__hidden)
+				return false;
 			var parentObject = item.parentObject;
 			var hidden = parentObject
 				? (parentObject.__enum || parentObject._isEnum)

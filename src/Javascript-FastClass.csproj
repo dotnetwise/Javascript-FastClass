@@ -105,6 +105,7 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Scripts\NamespacesAndEnumSupport.js" />
     <Content Include="Scripts\Tests\FastClass.Tests.js" />
     <Content Include="Scripts\Tests\qunit.css" />
     <Content Include="content\scripts\FastClass.min.js">
@@ -119,7 +120,6 @@
     <Content Include="Scripts\jquery-1.9.1.min.js">
       <DependentUpon>jquery-1.9.1.js</DependentUpon>
     </Content>
-    <Content Include="Scripts\NamespacesAndEnumSupport.js" />
     <Content Include="Scripts\Tests\qunit.js" />
     <Content Include="Scripts\Tests\Index.html" />
     <Content Include="Scripts\_references.js" />

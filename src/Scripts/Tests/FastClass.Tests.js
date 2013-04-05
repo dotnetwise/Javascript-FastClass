@@ -1,9 +1,9 @@
 ﻿/// <reference path="../../content/scripts/fastclass.js" />
 /// <reference path="qunit.js" />
-var A = Function.define(function (val) {
+var A = Function.define(function A(val) {
 	this.val = val;
 }, {
-	method1: function (x, y, z) {
+	method1: function method1(x, y, z) {
 		this.x = x;
 		this.y = y;
 		this.z = z;
@@ -12,9 +12,9 @@ var A = Function.define(function (val) {
 
 //Follow derrivations using inheritWith
 
-var B = A.inheritWith(function (base, baseCtor) {
+var B = A.inheritWith(function B(base, baseCtor) {
 	return {
-		method1: function (y, z) {
+		method1: function method1(y, z) {
 			base.method1.call(this, 'x', 'y', z);
 		}
 	};
@@ -32,11 +32,12 @@ var C = B.inheritWith(function (base, baseCtor) {
 var Point = function Point() {
 	this.point = { x: 1, y: 2 };
 }.define({
-	x: function x(x) {
+	name: "Point",
+	getOrSetX: function x(x) {
 		/// <param name="x" optional="true">Specify a value to set the point.x. Don't specify anything will retrieve point.x</param>
 		return arguments.length ? (this.point.x = x) && this || this : this.point.x;
 	},
-	y: function y(y) {
+	getOrSetY: function y(y) {
 		/// <param name="y" optional="true">Specify a value to set the point.y. Don't specify anything will retrieve point.y</param>
 		return arguments.length ? (this.point.y = y) && this || this : this.point.y;
 	}
@@ -68,7 +69,7 @@ test("a,b,c,d instanceof A", function () {
 test("a,b,c,d instanceof A", function () {
 	equal(a instanceof B, false, "a instanceof B should return false!");
 	equal(b instanceof B, true, "b instanceof B should return true!");
-	equal(c instanceof B, true,"c instanceof B should return true!");
+	equal(c instanceof B, true, "c instanceof B should return true!");
 	equal(d instanceof B, true, "d instanceof B should return true!");
 });
 test("a,b,c,d instanceof C", function () {
@@ -84,10 +85,10 @@ test("a,b,c,d instanceof D", function () {
 	equal(d instanceof D, true, "d instanceof D should return true!");
 });
 test("mixin added to D", function () {
-	equal(typeof d.x, "function", "d.x should be a function from mixin Point");
-	equal(d.x(), 1, "d.x should return 1");
-	equal(d.x(3), d, "d.x(3) should set d.point.x to 3 and return d");
-	equal(d.x(), 3, "d.x should return 3");
+	equal(typeof d.getOrSetX, "function", "d.getOrSetX should be a function from mixin Point");
+	equal(d.getOrSetX(), 1, "d.getOrSetX() should return 1");
+	equal(d.getOrSetX(3), d, "d.getOrSetX(3) should set d.point.x to 3 and return d");
+	equal(d.getOrSetX(), 3, "d.getOrSetX() should return 3");
 });
 test("multiple mixins adding same property should trigger an assert", function () {
 	raises(function () {
@@ -95,7 +96,7 @@ test("multiple mixins adding same property should trigger an assert", function (
 			this.constructor = function E() { }
 		}, Point, Point);
 	},
-	/The '(.+)' mixin defines a 'function' named '(.+)' which is already defined on the class ('E')?!/,
+	/The '(.+)' mixin defines a '(.+)' named '(.+)' which is already defined on the class ('.*')?!/,
 		"adding same mixin twice should trigger an warning"
 	);
 });
@@ -103,38 +104,65 @@ test("Function.define should automatically initialize mixins", function () {
 	var F = Function.define(function () {
 	}, {}, Point);
 	var f = new F();
-	equal(typeof f.x, "function", "Function.define(function() {}, {}, Point) should automatically initialize mixin Point");
-	f.x(10);
+	equal(typeof f.getOrSetX, "function", "Function.define(function() {}, {}, Point) should automatically initialize mixin Point");
+	f.getOrSetX(10);
 	equal(f.point.x, 10);
 });
 test("Function.define with an object", function () {
 	var F = Function.define({
-		constructor: function (abc) {
+		constructor: function F(abc) {
 			this.abc = abc;
 		}
 	}, {}, Point);
 	var f = new F("abc");
-	equal(typeof f.x, "function", "Function.define(function() {}, {}, Point) should automatically initialize mixin Point");
+	equal(typeof f.getOrSetX, "function", "Function.define(function() {}, {}, Point) should automatically initialize mixin Point");
 	equal(f.abc, "abc");
-	f.x(20);
-	equal(f.x(), 20);
+	f.getOrSetX(20);
+	equal(f.getOrSetX(), 20);
 });
+
+
 test("Function.define should create mixins the same way as function(){}.define({}) does", function () {
-	var xMixin = Function.define({
-		constructor: function () {
-			this.xyz = 1;
+
+	var Size = Function.define({
+		constructor: function xMixin(prototype, ctor) {
+			this.size = { width: 0, height: 0 };
+			//intellisense.logMessage("Sizing" + /function (.*)\(.*\)/gi.exec(arguments.callee.caller.toString())[1]);
+			this.aSizeProto = prototype;
+			this.
+			a;
+			return this;
 		},
-		xxyyzz: function () { return this.xyz;}
-	});
-	var F = Function.define({
-		constructor: function (abc) {
-			this.abc = abc;
+		width: function width() {
+			return this.size.width;
+			a;
 		}
-	}, xMixin, Point);
+	});
+
+	var Color = Function.define(function Color(prototype, ctor) {
+		this.color = { color: "white", transparency: 0 };
+	}, {
+		isWhite: function isWhite() {
+			return this.color.color === "white";
+		}
+	});
+	
+	var F = Function.define({
+		constructor: function F(abc) {
+			this.abc = abc;
+		},
+		f: function () {
+		}
+	}, Size, Point, Color);
+
 	var f = new F("abc");
-	equal(typeof f.x, "function", "Function.define(function() {}, {}, Point) should automatically initialize mixin Point");
-	equal(f.abc, "abc");
-	equal(f.xyz, 1);
-	f.xyz = 30;
-	equal(f.xxyyzz(), 30);
+	equal(typeof f.getOrSetX, "function", "Function.define(function() {}, {}, Point, Size, Color) should automatically initialize mixins Point, Size and Color");
+	equal(f.abc, "abc");//comes from F constructor
+	equal(f.size.width, 0);//comes from Size constructor
+	f.size.width = 30;//comes from Size constructor
+	equal(f.width(), 30);//comes from Size.prototype
+	equal(f.point.x, 1);//comes from Point constructor
+	equal(f.getOrSetX(), 1);//comes from Point.prototype
+	equal(f.color.color, "white");//comes from Color constructor
+	equal(f.isWhite(), true);//comes from Color.prototype
 });
