@@ -193,12 +193,12 @@
 			//	}
 			//inject properties from the new constructor
 			//extendeePrototype = {};
-			intellisense.logMessage("injecting ctor.properties into " + JSON.stringify(creatorResult) + /function (.*)\(.*\)/gi.exec(arguments.callee.caller.caller.caller.toString())[1])
+			//intellisense.logMessage("injecting ctor.properties into " + JSON.stringify(creatorResult) + /function (.*)\(.*\)/gi.exec(arguments.callee.caller.caller.caller.toString())[1])
 			__.prototype = extendeePrototype;
 			var proto = new __;
 			constructor.call(proto);
 			for (var i in proto) {
-				intellisense.logMessage(i)
+				//intellisense.logMessage(i)
 				if (i !== "constructor")
 					//if (proto.hasOwnProperty(i))
 					if (!creatorResult.hasOwnProperty(i))

@@ -11,6 +11,7 @@
     <description>A fast and lightest prototype inheritance when you can't use any complied library such as TypeScript or Google Closure</description>
     <owners>DotNetWise</owners>
     <releaseNotes>
+      Added sugar for Function.abstract to quickly define abstract methods
       Allow 'abstract' members on class/mixin so they can be redefined by another mixin. Usage: function() {}.defineStatic({abstract:true});
       Added Function.prototype.defineStatic({}) to define static members on the given function.
       Fixed defining mixins with Function.define({
