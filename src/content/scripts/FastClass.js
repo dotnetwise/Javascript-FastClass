@@ -261,20 +261,34 @@
 		return result;
 	};
 
-	Function.initMixins = function initMixins(o) {
-		if (o && !o.__initMixins__) {
-			var p = o, mixins, length, i, mixin, calledMixins = {};
-			o.__initMixins__ = 1;
+	Function_prototype.defineStatic = function (copyPropertiesFrom) {
+		/// <summary>Copies all the members of the given object, including those on its prototype if any, to this function (and not on its prototype)<br/>For extending this functions' prototype use .define()</summary>
+		/// <param name="copyPropertiesFrom" type="Object">The object to copy the properties from</param>
+		if (copyPropertiesFrom)
+		for (var i in copyPropertiesFrom) {
+			this[i] = copyPropertiesFrom[i];
+		}
+		return this;
+	}
+
+	Function.initMixins = function initMixins(objectInstance) {
+		/// <signature>
+		/// <summary>Initializes the mixins on all of the prototypes of the given object instance<br/>This should only be called once per object, usually in the first constructor (the most base class)</summary>
+		/// <param name="objectInstance" type="Object">The object instance for which the mixins needs to be initialized</param>
+		/// </signature>
+		if (objectInstance && !objectInstance.__initMixins__) {
+			var p = objectInstance, mixins, length, i, mixin, calledMixins = {};
+			objectInstance.__initMixins__ = 1;
 			WAssert(true, window.vs2012Intellisense && function WAssert() {
 				//hide __initMixins from VS2012 intellisense
-				o.__initMixins__ = { __hidden: true };
+				objectInstance.__initMixins__ = { __hidden: true };
 			});
 			while (p) {
 				p = supportsProto ? p.__proto__ : Object.getPrototypeOf(p);
 				if (p && p.hasOwnProperty("__mixins__") && (mixins = p.__mixins__) && (length = mixins.length))
 					for (i = 0; mixin = mixins[i], i < length; i++) {
 						//WAssert(true, window.vs2012Intellisense && function WAssert() {
-						//	//for correct VS2012 intellisense, at the time of mixin declaration we need to execute new mixin() rather than mixin.call(o, p, p.constructor) otherwise the glyph icons will look like they are defined on mixin / prototype rather than on the mixin itself
+						//	//for correct VS2012 intellisense, at the time of mixin declaration we need to execute new mixin() rather than mixin.call(objectInstance, p, p.constructor) otherwise the glyph icons will look like they are defined on mixin / prototype rather than on the mixin itself
 						//	if (!(mixin in calledMixins)) {
 						//		calledMixins[mixin] = 1;
 						//		new mixin(p, p.constructor);
@@ -282,11 +296,11 @@
 						//});
 						if (!(mixin in calledMixins)) {
 							calledMixins[mixin] = 1;
-							mixin.call(o, p, p.constructor);
+							mixin.call(objectInstance, p, p.constructor);
 						}
 					}
 			}
-			delete o.__initMixins__;
+			delete objectInstance.__initMixins__;
 		}
 	};
 

@@ -146,7 +146,7 @@ test("Function.define should create mixins the same way as function(){}.define({
 			return this.color.color === "white";
 		}
 	});
-	
+
 	var F = Function.define({
 		constructor: function F(abc) {
 			this.abc = abc;
@@ -165,4 +165,24 @@ test("Function.define should create mixins the same way as function(){}.define({
 	equal(f.getOrSetX(), 1);//comes from Point.prototype
 	equal(f.color.color, "white");//comes from Color constructor
 	equal(f.isWhite(), true);//comes from Color.prototype
+});
+
+test("Function.defineStatic should define static members on the given function", function () {
+	var F = Function.define({
+		constructor: function F(abc) {
+			this.abc = abc;
+		}
+	}).defineStatic({
+		m: function () {
+			return "m";
+		},
+		a: 1,
+		b: undefined
+	});
+	
+	var f = new F("abc");
+	equal(typeof F.m, "function");
+	equal(F.m(), "m");
+	equal(F.a, 1);
+	equal("b" in F, true);
 });
