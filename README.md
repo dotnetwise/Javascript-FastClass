@@ -43,7 +43,7 @@ function Engine() {
 
 var toyota = new Car("toyota prius", "red");//creating a new Car
 toyota.powerSouce; //petrol
-toyota.powerSource = 'electric'; //changing the powerSource proerty 
+toyota.powerSource = 'electric'; //changing the powerSource property 
 toyota.isElectric();//returns true
 toyota.draw(); 
 //Drawing a red car. 
