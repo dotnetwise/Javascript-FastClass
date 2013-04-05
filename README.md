@@ -245,6 +245,21 @@ var Animal = Function.define(function(){
 });
 ```
 
+Or even simpler as an object providing the `constructor`:
+```javascript
+var Animal = Function.define({
+    constructor: function(){ // the constructor is optional
+        // Private 
+        function private1() {}
+        function private2() {}
+         // Privileged - on instance
+        this.privileged1 = function(){}
+        this.privileged2 = function(){}
+    },
+    method1: function() { console.log("Animal::method1"); }
+});
+```
+
 The `function Animal` is the `function` given as first parameter. 
 It acts as the constructor, which is invoked when an instance is created:
 
@@ -275,7 +290,7 @@ function Move() {//define the constructor of the mixin. This will be automatical
 });
 ```
 
-### Adding Inheritance and using the `Move mixin`
+### Adding Inheritance and using the `Move` mixin
 
 #### Usage using `.inheritWith` flavour
 
@@ -356,6 +371,45 @@ var Dog = Animal.fastClass(function(base, baseCtor) {
     //some more public functions
     this.method2 = function() {}; 
 }, Move);
+```
+### Static members
+You can sometime extend a constructor or a function with some static methods
+In order to do so you need to call `.defineStatic({...})`
+
+```javascript
+var F = function() {}.defineStatic({
+    loadData: function() {...}
+}).
+typeof F.loadData // returns function
+F.loadData() //call the static function
+```
+
+This can be easily mixed with `Function.define`
+```javascript
+var F = Function.define({
+    constructor: function() {}
+).defineStatic({//make sure you are adding it here and not on the constructor function itself. 
+//that is because Function.define will automatically declare a function in order 
+//to ensure Function.initMixins gets automatically called
+
+//add any static members here
+    loadData: function() {...}
+};
+typeof F.loadData // returns function
+F.loadData() //call the static function
+```
+
+### Mixin `abstract` methods
+The `Function.initMixins` will always check for duplicate members that are already defined in the object i.e. the class defines a member whith the same name, or another mixin defines it.
+If such collision is found an exception will be thorwn when using the debug version of the library. Using the `.min` file there is no error and the member will be overriden.
+
+However in order to prevent this exception you can define a function as abstract with `.defineStatic(obj)`:
+```javascript
+var Animal = Function.define({    
+    method1: function() { 
+        throw new Exception("You need to implement method1 on your class's or mixin's prototype")
+    }.defineStatic({abstract: true});//make this function abstract so it can be overriden by mixins
+});
 ```
 
 ## Where to get it from?
