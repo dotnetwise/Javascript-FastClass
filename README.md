@@ -412,6 +412,19 @@ var Animal = Function.define({
 });
 ```
 
+### Abstract methods sugar
+```javascript
+var f = Function.abstract();
+f();//will trigger a failed assert with message "Not implemented"
+var g = Function.abstract("Custom not implemented message");
+g();//will trigger a failed assert with message "Custom not implemented message"
+f.abstract === true;//true
+var h = Function.abstract(function() { /* will be called before the assert "Not implemented" will be thrown */});
+h();//will call the given function and then will trigger a failed assert with message "Not implemented"
+var j = Function.abstract("Custom not implemented message", function() { /* will be called before the assert "Not implemented" will be thrown */});
+j();//will call the given function and then will trigger a failed assert with message "Custom not implemented message"
+```
+
 ## Where to get it from?
 Beside GitHub, you can download it as a <a href="http://nuget.org/packages/Javascript-FastClass/" target="_blank"><code>Nuget package</code></a> in Visual Studio from<a href="http://nuget.org/packages/Javascript-FastClass/" target="_blank"><code>here</code></a>
 ```javascript
