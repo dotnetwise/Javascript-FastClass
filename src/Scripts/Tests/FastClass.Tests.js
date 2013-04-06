@@ -223,7 +223,8 @@ test("Function.abstract should define an abstract function that throw an excepti
 	equal(f.abc, 1, "Ensure the custom function was called");
 	equal(F.prototype.method.abstract, true, "The function should have static member abstract = true");
 });
-test("Method defined as Function.* and Function.prototype.* should not be enumerable", function () {
+test("Method defined as Function.* and Function.prototype.* should not be enumerable.", function () {
+	ok(true, "We do expect this test to fail on IE8/IE7");
 	for (var f in Function)
 		ok(false, f + " should not enumerable on Function");
 	for (var f in Function.prototype)

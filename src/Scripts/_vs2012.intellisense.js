@@ -2,8 +2,7 @@
 
 (function () {
 	//export this so we can 'auto create' classes for triggering VS2012 Intellisense
-	window.vs2012Intellisense = true;
-	//Usage: WAssert(!window.vs2012Intellisense, function() { new Ctor(...) }) - where Ctor is the constructor of the class you want to create. Or you can simply call some functions
+	//Usage: WAssert(window.intellisense && function() { /*doSomething in VS2012 to help intellisense*/ }) this way will ensure this code won't get into the .min file. You need to uncomment WAssert and String.format from NamespacesAndEnumSupport.js
 	var reservedKeywords = {};
 	['break', 'case', 'catch', 'continue', 'debugger', 'default', 'delete', 'do', 'else', 'finally',
 	 'for', 'function', 'if', 'in', 'instanceof', 'new', 'return', 'switch', 'this', 'throw', 'try',
@@ -12,7 +11,7 @@
 	].forEach(function (keyword) {
 		reservedKeywords[keyword] = 1;
 	});
-	intellisense.addEventListener('statementcompletion', function (e) {
+	window.intellisense && intellisense.addEventListener('statementcompletion', function (e) {
 		e.items.forEach(function (item) {
 			var value = item.value,
 				parentObject = item.parentObject,
@@ -157,7 +156,7 @@
 		});
 	});
 
-	intellisense.addEventListener('statementcompletionhint', function (e) {
+	window.intellisense && intellisense.addEventListener('statementcompletionhint', function (e) {
 		if (e.completionvalue) {
 			//intellisense.logMessage("statementcompletionhint");
 			if (e.completionvalue._isNamespace || e.completionvalue.__namespace) {
@@ -506,7 +505,7 @@
 	//  Copy plain comments into description property if available.
 	//  Do not copy if VS doc comments are there.
 	//
-	intellisense.addEventListener('statementcompletionhint', function (event) {
+	window.intellisense && intellisense.addEventListener('statementcompletionhint', function (event) {
 		if (event.symbolHelp.description) return;
 		var itemValue = event.completionItem.value;
 		if (typeof itemValue === "function") {
@@ -538,7 +537,7 @@
 
 		return str;
 	}
-	intellisense.addEventListener('signaturehelp', function (event) {
+	window.intellisense && intellisense.addEventListener('signaturehelp', function (event) {
 		var functionHelp = event.functionHelp;
 		var functionName = event && event.functionHelp && event.functionHelp.functionName;
 		if (event.parentObject && typeof event.parentObject === "function"
@@ -576,7 +575,7 @@
 								if (typeof param[attr] === "string")
 									param[attr] = param[attr] == "true" || param[attr] == "1" || param[attr] == true;
 							});
-							
+
 							delete param.__value;
 							s.params.push(param);
 						});

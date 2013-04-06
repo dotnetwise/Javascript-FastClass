@@ -34,8 +34,8 @@
 		/// <param name="arg2" type="Object" optional="true">Second argument to replace all of the {1} occurences from the message</param>
 		/// <param name="argEtc" type="Object" optional="true" parameterArray="true">Third argument to replace all of the {3} occurences from the message.<br/> You can add as many arguments as you want and they will be replaced accordingly</param>
 		if (typeof message === "function")
-			message = message() || "";
-		if (!trueishCondition) {
+			message = message.apply(this, arguments) || "";
+		if (typeof trueishCondition === "function" ? !trueishCondition.apply(this, arguments) : !trueishCondition) {
 			var parameters = Array.prototype.slice.call(arguments, 1);
 			var msg = typeof message == "string" ? String.format.apply(message, parameters) : message;
 			return window.console && !console.__throwErrorOnAssert && console.assert && console.assert.bind && console.assert.bind(console, trueishCondition, msg) || function consoleAssertThrow() { throw msg; };
@@ -48,6 +48,7 @@
 	var Array_prototype = Array.prototype;
 	var Array_prototype_forEach = Array_prototype.forEach;
 	var Object_defineProperty = Object.defineProperty;
+	var Object_defineProperties = typeof Object.defineProperties === "function"
 	var supportsProto = {};
 
 	supportsProto = supportsProto.__proto__ === Object.prototype;
@@ -58,6 +59,19 @@
 			supportsProto = supportsProto.Object === 1;//setting __proto__ in firefox is terribly slow!
 		} catch (ex) { supportsProto = false; }
 	}
+	/* IE8 and older hack! */
+	if (typeof Object.getPrototypeOf !== "function")
+		Object.getPrototypeOf = supportsProto
+			? function (object) {
+				return object.__proto__;
+			}
+			: function (object) {
+				// May break if the constructor has been tampered with
+				return object == null || !object.constructor || object === Object.prototype ? null :
+					(object.constructor.prototype === object ?
+					Object.prototype
+					: object.constructor.prototype);
+			};
 	function __() { };
 	//for ancient browsers - polyfill Array.prototype.forEach
 	if (!Array_prototype_forEach) {
@@ -106,7 +120,7 @@
 			baseCtor.apply(this, arguments);
 		}; //automatic constructor if ommited
 
-		WAssert(true, window.vs2012Intellisense && function WAssertRedirectDefinition() {
+		WAssert(true, window.intellisense && function WAssertRedirectDefinition() {
 			//trigger intellisense on VS2012 when pressing F12 (go to reference) to go to the creator rather than the defaultCtor
 			intellisense.redirectDefinition(Derrived, creator);
 		});
@@ -151,7 +165,7 @@
 		}
 		prototype = null;
 		//intellisense.logMessage("defining....");
-		(arguments.length > 2 || mixins) && (("__mixins__" in extendeePrototype) || (Object.defineProperty(extendeePrototype, "__mixins__", { enumerable: false, value: [], writeable: false }).__mixins__.__hidden = true)) && Array_prototype_forEach.call(arguments, function forEachMixin(mixin, index, mixinValue, isFunction) {
+		(arguments.length > 2 || mixins) && (extendeePrototype.hasOwnProperty("__mixins__") || (Object_defineProperties ? (Object_defineProperty(extendeePrototype, "__mixins__", { enumerable: false, value: [], writeable: false }).__mixins__.__hidden = true) : extendeePrototype.__mixins__ = [])) && Array_prototype_forEach.call(arguments, function forEachMixin(mixin, index, mixinValue, isFunction) {
 			isFunction = typeof mixin === 'function';
 			if (isFunction) {
 				__.prototype = mixin.prototype;
@@ -174,7 +188,7 @@
 								var msg = "The '{0}' mixin defines a '{1}' named '{2}' which is already defined on the class {3}!"
 									.format(isFunction && mixin.name || (index - 1), typeof mixinValue[key] === "function" ? "function" : "member", key, constructor.name ? ("'" + constructor.name + "'") : '');
 								console.log(msg)
-								window.vs2012Intellisense && intellisense.logMessage(msg);
+								window.intellisense && intellisense.logMessage(msg);
 								throw msg;
 							}
 							//set a custom glyph icon for mixin functions
@@ -186,7 +200,7 @@
 					}
 			}
 		});
-		WAssert(true, window.vs2012Intellisense && function WAssertExtending() {
+		WAssert(true, window.intellisense && function WAssertExtending() {
 			//trigger intellisense on VS2012 for base class members, because same as IE, VS2012 doesn't support __proto__
 			//for (var i in extendeePrototype)
 			//	if (!creatorResult.hasOwnProperty(i)) {
@@ -230,10 +244,10 @@
 			constructor = func.hasOwnProperty("constructor") ? func.constructor : function constructorDefaultObjConstructor() { };
 
 			constructor.prototype = func;
-			WAssert(true, window.vs2012Intellisense && function WAssert() {
+			WAssert(true, window.intellisense && function WAssert() {
 				//VS2012 intellisense don't forward the actual creator as the function's prototype b/c we want to "inject" constructor's members into it
-				function clone() { 
-					for(var i in func)
+				function clone() {
+					for (var i in func)
 						if (func.hasOwnProperty(i))
 							this[i] = func[i];
 				}
@@ -258,8 +272,8 @@
 		//we are sharing constructor's prototype
 		result.prototype = constructor.prototype;
 		//forward the VS2012 intellisense to the given constructor function
-		WAssert(true, window.vs2012Intellisense && function WAssert() {
-			intellisense.redirectDefinition(result, constructor);
+		WAssert(true, window.intellisense && function WAssert() {
+			window.intellisense && intellisense.redirectDefinition(result, constructor);
 		});
 		return result;
 	};
@@ -268,16 +282,16 @@
 		/// <summary>Copies all the members of the given object, including those on its prototype if any, to this function (and not on its prototype)<br/>For extending this functions' prototype use .define()</summary>
 		/// <param name="copyPropertiesFrom" type="Object">The object to copy the properties from</param>
 		if (copyPropertiesFrom)
-		for (var i in copyPropertiesFrom) {
-			this[i] = copyPropertiesFrom[i];
-		}
+			for (var i in copyPropertiesFrom) {
+				this[i] = copyPropertiesFrom[i];
+			}
 		console.log(this);
 		return this;
 	}
 	function defaultAbstractMethod() {
 		WAssert(false, "Not implemented")();
 	}
-	defaultAbstractMethod.defineStatic({abstract:true});
+	defaultAbstractMethod.defineStatic({ abstract: true });
 	Function.abstract = function (message, func) {
 		/// <summary>Returns an abstract function that asserts the given message. Optionally you can add some code to happen before assertion too</summary>
 		/// <param name="message" type="String || Function">The message to be thrown when the newly method will be called. <br/>Defaults to: Not implemented</param>
@@ -291,7 +305,7 @@
 				WAssert(false, message)();
 			else defaultAbstractMethod();
 		}).defineStatic({ abstract: true }) : defaultAbstractMethod;
-		WAssert(true, window.vs2012Intellisense && function () {
+		WAssert(true, window.intellisense && function () {
 			if (result != defaultAbstractMethod) {
 				if (typeof message === "function")
 					intellisense.redirectDefinition(result, message);
@@ -310,7 +324,7 @@
 		if (objectInstance && !objectInstance.__initMixins__) {
 			var p = objectInstance, mixins, length, i, mixin, calledMixins = {};
 			objectInstance.__initMixins__ = 1;
-			WAssert(true, window.vs2012Intellisense && function WAssert() {
+			WAssert(true, window.intellisense && function WAssert() {
 				//hide __initMixins from VS2012 intellisense
 				objectInstance.__initMixins__ = { __hidden: true };
 			});
@@ -318,7 +332,7 @@
 				p = supportsProto ? p.__proto__ : Object.getPrototypeOf(p);
 				if (p && p.hasOwnProperty("__mixins__") && (mixins = p.__mixins__) && (length = mixins.length))
 					for (i = 0; mixin = mixins[i], i < length; i++) {
-						//WAssert(true, window.vs2012Intellisense && function WAssert() {
+						//WAssert(true, window.intellisense && function WAssert() {
 						//	//for correct VS2012 intellisense, at the time of mixin declaration we need to execute new mixin() rather than mixin.call(objectInstance, p, p.constructor) otherwise the glyph icons will look like they are defined on mixin / prototype rather than on the mixin itself
 						//	if (!(mixin in calledMixins)) {
 						//		calledMixins[mixin] = 1;
@@ -334,15 +348,15 @@
 			delete objectInstance.__initMixins__;
 		}
 	};
-	
-	if (typeof Object.defineProperties === "function") {
+
+	if (Object_defineProperties) {
 		var o = {
 			0: [Function, "initMixins", "define", "abstract"],
 			1: [Function_prototype, "fastClass", "inheritWith", "define", "defineStatic"]
 		}
 		for (var p in o)
-			for (var props = o[p], obj = props[0], i = 1, prop; prop = props[i],i < props.length; i++) {
-				Object.defineProperty(obj, prop, { enumerable: false, value: obj[prop] });
+			for (var props = o[p], obj = props[0], i = 1, prop; prop = props[i], i < props.length; i++) {
+				Object_defineProperty(obj, prop, { enumerable: false, value: obj[prop] });
 			}
 	}
 

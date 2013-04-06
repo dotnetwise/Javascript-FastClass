@@ -3,18 +3,20 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
     <id>Javascript-FastClass</id>
-    <version><![CDATA[1.0.406.130133]]></version>
+    <version><![CDATA[1.0.406.154135]]></version>
     <title>Fast Class Javascript Inheritance</title>
     <authors>DotNetWise</authors>
     <description>A fast and lightest prototype inheritance when you can't use any complied library such as TypeScript or Google Closure</description>
     <owners>DotNetWise</owners>
     <releaseNotes>
+      Fixed missing Object.getPrototypeOf for IE8 or older. All the tests are passing even in IE7 (except enumerable properties which is expected)
+      Dropped dependence https://github.com/dotnetwise/VS2012-Javascript-Intellisense
       Added sugar for Function.abstract to quickly define abstract methods
       Allow 'abstract' members on class/mixin so they can be redefined by another mixin. Usage: function() {}.defineStatic({abstract:true});
       Added Function.prototype.defineStatic({}) to define static members on the given function.
       Fixed defining mixins with Function.define({
-        constructor: function() {},
-        method: function() {}
+      constructor: function() {},
+      method: function() {}
       });
       Fixed intellisense
       Added unit-tests
