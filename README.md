@@ -7,7 +7,7 @@ A faster and easier way to define Javascript Prototypal Inheritance: `classes` a
 *  Among <a href="http://jsperf.com/js-inheritance-performance/36" target="_blank"><code>popular libraries define + usage</code></a> - 3 classes and 3 methods * 500 instances each
 *  <a href="http://jsperf.com/js-inheritance-performance/35" target="_blank"><code>Fastest libraries define + usage</code></a> - 3 classes and 3 methods * 500 instances each
 *  <a href="http://jsperf.com/js-inheritance-performance/34" target="_blank"><code>Fastest libraries define only</code></a> - 3 classes and 3 methods * 1 instances each
-*  Unit <a href="http://htmlpreview.github.io/?https://github.com/dotnetwise/Javascript-FastClass/blob/master/src/Scripts/Tests/Index.html">tests</a>
+*  <a href="http://htmlpreview.github.io/?https://github.com/dotnetwise/Javascript-FastClass/blob/master/src/Scripts/Tests/Index.html" target="_blank">Unit tests</a> - so you can see it just works
 
 ## Syntactic sugar
 ```javascript
