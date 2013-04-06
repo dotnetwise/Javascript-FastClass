@@ -47,6 +47,7 @@
 	var Function_prototype = Function.prototype;
 	var Array_prototype = Array.prototype;
 	var Array_prototype_forEach = Array_prototype.forEach;
+	var Object_defineProperty = Object.defineProperty;
 	var supportsProto = {};
 
 	supportsProto = supportsProto.__proto__ === Object.prototype;
@@ -226,7 +227,7 @@
 		var constructor = func || function defineDefaultConstructor() { }; //automatic constructor if ommited
 		var applyDefine = arguments.length > 1;
 		if (typeof func !== "function") {
-			constructor = func.constructor || function constructorDefaultObjConstructor() { };
+			constructor = func.hasOwnProperty("constructor") ? func.constructor : function constructorDefaultObjConstructor() { };
 
 			constructor.prototype = func;
 			WAssert(true, window.vs2012Intellisense && function WAssert() {
@@ -270,6 +271,7 @@
 		for (var i in copyPropertiesFrom) {
 			this[i] = copyPropertiesFrom[i];
 		}
+		console.log(this);
 		return this;
 	}
 	function defaultAbstractMethod() {
@@ -280,7 +282,7 @@
 		/// <summary>Returns an abstract function that asserts the given message. Optionally you can add some code to happen before assertion too</summary>
 		/// <param name="message" type="String || Function">The message to be thrown when the newly method will be called. <br/>Defaults to: Not implemented</param>
 		/// <param name="func" type="Function" optional="true">Specify a custom function to be called before the assertion is thrown.</param>
-		var result = message || func ? function () {
+		var result = message || func ? (function () {
 			if (typeof message === "function")
 				message.apply(this, arguments);
 			if (typeof func === "function")
@@ -288,7 +290,7 @@
 			if (typeof message === "string")
 				WAssert(false, message)();
 			else defaultAbstractMethod();
-		}.defineStatic({ abstract: true }) : defaultAbstractMethod;
+		}).defineStatic({ abstract: true }) : defaultAbstractMethod;
 		WAssert(true, window.vs2012Intellisense && function () {
 			if (result != defaultAbstractMethod) {
 				if (typeof message === "function")
@@ -332,6 +334,17 @@
 			delete objectInstance.__initMixins__;
 		}
 	};
+	
+	if (typeof Object.defineProperties === "function") {
+		var o = {
+			0: [Function, "initMixins", "define", "abstract"],
+			1: [Function_prototype, "fastClass", "inheritWith", "define", "defineStatic"]
+		}
+		for (var p in o)
+			for (var props = o[p], obj = props[0], i = 1, prop; prop = props[i],i < props.length; i++) {
+				Object.defineProperty(obj, prop, { enumerable: false, value: obj[prop] });
+			}
+	}
 
 })();
 
