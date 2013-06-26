@@ -122,7 +122,8 @@
 
 		WAssert(true, window.intellisense && function WAssertRedirectDefinition() {
 			//trigger intellisense on VS2012 when pressing F12 (go to reference) to go to the creator rather than the defaultCtor
-			intellisense.redirectDefinition(Derrived, creator);
+			intellisense.redirectDefinition(Derrived, creatorResult.hasOwnProperty('constructor') ? creatorResult.constructor : creator);
+			intellisense.annotate(Derrived, creatorResult.hasOwnProperty('constructor') ? creatorResult.constructor : baseCtor);
 		});
 		var derrivedPrototype;
 		__.prototype = this.prototype;

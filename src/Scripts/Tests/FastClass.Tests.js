@@ -15,7 +15,7 @@ var A = Function.define(function A(val) {
 var B = A.inheritWith(function B(base, baseCtor) {
 	return {
 		method1: function method1(y, z) {
-			base.method1.call(this, 'x', 'y', z);
+			base.method1.call(this, 'x', y, z);
 		}
 	};
 });
