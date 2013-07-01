@@ -1,4 +1,4 @@
-﻿////For performance tests please see: http://jsperf.com/js-inheritance-performance/34 + http://jsperf.com/js-inheritance-performance/35 + http://jsperf.com/js-inheritance-performance/36
+////For performance tests please see: http://jsperf.com/js-inheritance-performance/34 + http://jsperf.com/js-inheritance-performance/35 + http://jsperf.com/js-inheritance-performance/36
 
 (function selfCall() {
 	if (!String.prototype.format) {
@@ -286,7 +286,6 @@
 			for (var i in copyPropertiesFrom) {
 				this[i] = copyPropertiesFrom[i];
 			}
-		console.log(this);
 		return this;
 	}
 	function defaultAbstractMethod() {
