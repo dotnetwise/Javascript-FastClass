@@ -22,6 +22,12 @@
 		this.thisClassInstance = new Enumerator();
 		this.thisNamespace = Namespace;
 		this.thisEnum = Color.Red;
+		this.thisObservable = function () { };
+		this.thisObservable.__observable = true;
+		this.thisObservableArray = function () { };
+		this.thisObservableArray.__observableArray = true;
+		this.thisObservableComputed = function () { };
+		this.thisObservableComputed.__observableComputed = true;
 	}
 	Class.__map = true;
 	Demo.a = Class;
@@ -50,7 +56,6 @@
 	Demo.fieldNumber = 1;
 
 	var c = new Class();
-	
 	//uncomment any of these lines to test:
 	//Demo.
 	//Class.

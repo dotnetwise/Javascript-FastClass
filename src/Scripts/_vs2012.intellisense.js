@@ -66,6 +66,18 @@
 				item.kind = "field";
 				item.glyph = 'vs:GlyphGroupMap';
 			}
+			else if (value && (value._isObservableComputed || value.__observableComputed || value._isComputed || value.__computed)) {
+				item.kind = "field";
+				item.glyph = 'vs:GlyphGroupOperator';
+			}
+			else if (value && (value._isObservableArray || value.__observableArray)) {
+				item.kind = "field";
+				item.glyph = 'vs:GlyphGroupTemplate';
+			}
+			else if (value && (value._isObservable || value.__observable)) {
+				item.kind = "field";
+				item.glyph = 'vs:GlyphXmlItem';
+			}
 			else if (value && (value.prototype && value.prototype.nodeType || value.nodeType)) {
 				item.kind = "field";
 				item.glyph = 'vs:GlyphXmlItem';
@@ -78,7 +90,7 @@
 				item.kind = "field";
 				item.glyph = 'vs:GlyphXmlNamespace';
 			}
-			else if (item.name === "constructor" && typeof item.value === "function" || item.name[0].toUpperCase() == item.name[0] && item.name !== "Math") {
+			else if (item.name === "constructor" && typeof item.value === "function" || item.name[0].toUpperCase() == item.name[0] && item.name !== "Math" && item.__class !== false) {
 				item.glyph = 'vs:GlyphGroupClass';
 				item.kind = "method";
 			}
@@ -132,8 +144,7 @@
 				//are considered classes. 
 				//A constructor function starts with
 				//an uppercase letter by convention.  
-				if (typeof value == 'function' && (item.name[0].toUpperCase()
-					== item.name[0])) {
+				if (typeof value == 'function' && (item.name[0].toUpperCase() == item.name[0]) && !titem.__class !== false) {
 					item.glyph = 'vs:GlyphGroupClass';
 				}
 			}

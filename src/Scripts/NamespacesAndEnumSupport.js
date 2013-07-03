@@ -10,7 +10,10 @@ window.namespace = window.ns = function (names, container, separator) {
 	  len;
 	for (i = 0, len = ns.length; i < len; i++) {
 		o = o[ns[i]] = o[ns[i]] || {};
-		o.__namespace = true;
+		if (!o.__namespace)
+			Object.defineProperty
+				? Object.defineProperty(o, "__namespace", { enumerable: false, value: true })
+				: (o.__namespace = true);
 	}
 	return o;
 };
@@ -19,10 +22,11 @@ function Enum(values) {
 	/// <summary>Declares a new enum with the given values i.e. var colors = new Enum({ Red: 1, Green: 2, Blue: 3}) </summary>
 	/// <param name="values" type="PlainObject">Specify the values of the enum i.e. { Red: 1, Green: 2, Blue: 3}</param>
 
-	var _enum = this === window ? {} : this;
-	for (var v in values)
-		_enum[v] = values[v];
-	_enum.__enum = true;
+	var _enum = values || {};
+	if (!_enum.__enum)
+		Object.defineProperty
+			? Object.defineProperty(_enum, "__enum", { enumerable: false, value: true })
+			: (_enum.__enum = true);
 	return _enum;
 };
 
