@@ -154,7 +154,6 @@
 		/// <param name="creator" type="Object">An object containing members for the new function's prototype</param>
 		/// <param name="mixins"  type="Function || Plain Object" optional="true" parameterArray="true">Specify one ore more mixins to be added to the derrived function's prototype. <br/>A Mixin is either a function which returns a plain object, or a plan object in itself. It contains method or properties to be added to this function's prototype</param>
 		/// </signature>
-		Function_prototype.inheritWith()
 		var baseCtor = this;
 		var creatorResult = (typeof creator === "function" ? creator.call(this, this.prototype, this) : creator) || {};
 		var Derrived = creatorResult.hasOwnProperty('constructor') ? creatorResult.constructor : function inheritWithConstructor() {
