@@ -62,10 +62,10 @@
 	/* IE8 and older hack! */
 	if (typeof Object.getPrototypeOf !== "function")
 		Object.getPrototypeOf = supportsProto
-			? function (object) {
+			? function get__proto__(object) {
 				return object.__proto__;
 			}
-			: function (object) {
+			: function getConstructorHack(object) {
 				// May break if the constructor has been tampered with
 				return object == null || !object.constructor || object === Object.prototype ? null :
 					(object.constructor.prototype === object ?
@@ -176,11 +176,40 @@
 		return Derrived;
 	} :// when browser supports __proto__ setting it is way faster than iterating the object
 	function inheritWithProto(creator, mixins) {
-		/// <summary>Inherits the function's prototype to a new function named constructor returned by the creator parameter</summary>
+		/// <signature>
+		/// <summary>Inherits the function's prototype to a new function named constructor returned by the creator parameter
+		///<br/><br/>
+		/// var Square = Figure.inheritWith(function(base, baseCtor) { <br/>
+		/// ___ return { <br/>
+		/// ______ constructor: function(name) { //the cosntructor can be optional <br/>
+		/// _________ baseCtor.call(this, name); //explicitelly call the base class by name <br/>
+		/// ______ },<br/>
+		/// ______ draw: function() {  <br/>
+		/// _________ return base.call(this, "square"); //explicitely call the base class prototype's  method by name <br/>
+		/// ______ },<br/>
+		/// ___ };<br/>
+		/// }); // you can specify any mixins here<br/>
+		///</summary>
 		/// <param name="creator" type="Function">function(base, baseCtor) { return { constructor: function() {..}...} }<br/>where base is BaseClass.prototype and baseCtor is BaseClass - aka the function you are calling .inheritWith on</param>
-		/// <param name="mixins"  type="Function || Plain Object" optional="true" parameterArray="true">Specify one ore more mixins to be added to the derrived class. <br/>A Mixin is either a function which returns a plain object, or a plan object in itself. It contains method or properties to be added to this function's prototype</param>
+		/// <param name="mixins"  type="Function || Plain Object" optional="true" parameterArray="true">Specify one ore more mixins to be added to the derrived function's prototype. <br/>A Mixin is either a function which returns a plain object, or a plan object in itself. It contains method or properties to be added to this function's prototype</param>
+		/// </signature>
+		/// <signature>
+		/// <summary>Inherits the function's prototype to a new function named constructor passed into the object as parameter
+		///<br/><br/>
+		/// var Square = Figure.inheritWith({ <br/>
+		/// ___ constructor: function(name) { //the cosntructor can be optional <br/>
+		/// ______ Figure.call(this, name); //call the baseCtor <br/>
+		/// ___ },<br/>
+		/// ___ draw: function() {  <br/>
+		/// ______ return Figure.prototype.call(this, "square"); //call the base class prototype's method<br/>
+		/// ___ },<br/>
+		/// }); // you can specify any mixins here<br/>
+		///</summary>
+		/// <param name="creator" type="Object">An object containing members for the new function's prototype</param>
+		/// <param name="mixins"  type="Function || Plain Object" optional="true" parameterArray="true">Specify one ore more mixins to be added to the derrived function's prototype. <br/>A Mixin is either a function which returns a plain object, or a plan object in itself. It contains method or properties to be added to this function's prototype</param>
+		/// </signature>
 		var baseCtor = this;
-		var derrivedPrototype = creator.call(this, this.prototype, this) || {};
+		var derrivedPrototype = (typeof creator === "function" ? creator.call(this, this.prototype, this) : creator) || {};
 		var Derrived = derrivedPrototype.hasOwnProperty('constructor') ? derrivedPrototype.constructor : function inheritWithProtoDefaultConstructor() {
 			baseCtor.apply(this, arguments);
 		}; //automatic constructor if ommited
