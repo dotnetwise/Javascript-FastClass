@@ -555,23 +555,23 @@
 		/// <param name="target" type="Function">Any other function which has XMLDoc comments to copy from</param>
 		if (typeof target === "function") {
 			var f = intellisense.getFunctionComments(target);
-			var xmldoc = f.xmldoc = xml2json.parser(f.inside);
+			var xmldoc = f.xmldoc = xml2json.parser((f.inside || "").replace(/\<br\s*\/\>/gi, " "));
 			if (!xmldoc.signature)
 				xmldoc.signature = [xmldoc];
 			//event.functionHelp.signatures[0].params[0].description == "abcd"; // first parameter's description
 			var signatures = functionHelp.signatures;
 			signatures.splice(0, signatures.length);
 			each(xmldoc.signature, function (index, signature) {
-				var description = signature && signature.summary && signature.summary.__value;
+				var description = signature && signature.summary && signature.summary.__value || "";
 				var s = {
-					description: description,
+					description: description.replace(/\ /g, '<br/>'),
 					params: []
 				};
 				if (signature.param) {
 					if (typeof signature.param.push !== "function")
 						signature.param = [signature.param];
 					each(signature.param, function (index, param) {
-						param.description = param.__value;
+						param.description = (param.__value || "").replace(/\ /g, '<br/>');
 						each(["integer", "domElement", "mayBeNull", "elementInteger", "elementDomElement", "elementMayBeNull", "parameterArray", "optional"], function (index, attr) {
 							if (typeof param[attr] === "string")
 								param[attr] = param[attr] == "true" || param[attr] == "1" || param[attr] == true;
@@ -609,7 +609,7 @@
 			//call and apply helpers
 			var f = intellisense.getFunctionComments(event.parentObject);
 			event["_$functionComments"] = f;
-			var xmldoc = f.xmldoc = xml2json.parser(f.inside);
+			var xmldoc = f.xmldoc = xml2json.parser((f.inside || "").replace(/\<br\s*\/\>/gi, " "));
 			if (!xmldoc.signature)
 				xmldoc.signature = [xmldoc];
 			//event.functionHelp.signatures[0].params[0].description == "abcd"; // first parameter's description
@@ -617,9 +617,9 @@
 			if (functionName === "call") {
 				signatures.splice(0, signatures.length);
 				each(xmldoc.signature, function (index, signature) {
-					var description = signature && signature.summary && signature.summary.__value;
+					var description = signature && signature.summary && signature.summary.__value || "";
 					var s = {
-						description: [description, "", ".call executes the function with on the provided `this` context and with the provided parameters"].join("<br/>"),
+						description: [description.replace(/\ /g, '<br/>'), "", ".call executes the function with on the provided `this` context and with the provided parameters"].join("<br/>"),
 						params: []
 					};
 					s.params.push({
@@ -634,7 +634,7 @@
 						if (typeof signature.param.push !== "function")
 							signature.param = [signature.param];
 						each(signature.param, function (index, param) {
-							param.description = param.__value;
+							param.description = (param.__value || "").replace(/\ /g, '<br/>');
 							each(["integer", "domElement", "mayBeNull", "elementInteger", "elementDomElement", "elementMayBeNull", "parameterArray", "optional"], function (index, attr) {
 								if (typeof param[attr] === "string")
 									param[attr] = param[attr] == "true" || param[attr] == "1" || param[attr] == true;
