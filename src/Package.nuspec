@@ -3,12 +3,13 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
     <id>Javascript-FastClass</id>
-    <version><![CDATA[1.0.706.225041]]></version>
+    <version><![CDATA[1.0.712.213012]]></version>
     <title>Fast Class Javascript Inheritance</title>
     <authors>DotNetWise</authors>
     <description>A fast and lightest prototype inheritance when you can't use any complied library such as TypeScript or Google Closure</description>
     <owners>DotNetWise</owners>
     <releaseNotes>
+      Made use of intellisense.inheritXMLDoc so we automatically inherit XMLDoc from the first base class that has has one specified
       Fixed inheritWith to accept an object when __proto__ is available
       Added inheritWith support to only provided an object when you don't need to call the base or baseCtor, or you call them explicitely
       Fixed missing Object.getPrototypeOf for IE8 or older. All the tests are passing even in IE7 (except enumerable properties which is expected)

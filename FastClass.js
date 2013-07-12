@@ -115,6 +115,29 @@
 		//setting the derrivedPrototype to constructor's prototype
 		Derrived.prototype = derrivedProrotype;
 
+		WAssert(false, window.intellisense && function WAssertRedirectDefinition() {
+			//trigger intellisense on VS2012 when pressing F12 (go to reference) to go to the creator rather than the defaultCtor
+			var creatorResult = derrivedProrotype;
+			intellisense.redirectDefinition(Derrived, creatorResult.hasOwnProperty('constructor') ? creatorResult.constructor : creator);
+			intellisense.annotate(Derrived, creatorResult.hasOwnProperty('constructor') ? creatorResult.constructor : baseCtor);
+			creatorResult.constructor = Derrived;//ensure we're forwarding deep base classes constructor's XMLDoc to inherited constructors if they don't provide one
+			Object.getOwnPropertyNames(creatorResult).forEach(function (name) {
+				var f = creatorResult[name];
+				if (typeof f === "function") {
+					intellisense.addEventListener('signaturehelp', function (event) {
+						if (event.target != f) return;
+						var args = [event.functionHelp];
+						var p = baseClass.prototype;
+						while (p != Object.prototype) {
+							args.push(p.hasOwnProperty(name) ? p[name] : null);
+							p = Object.getPrototypeOf(p);
+						}
+						intellisense.inheritXMLDoc.apply(null, args);
+					});
+				}
+			});
+		});
+
 		creator = null;//set the first parameter to null as we have already 'shared' the base prototype into derrivedPrototype in the creator function by setting creator.prototype = base on above
 		arguments.length > 1 && Function_prototype.define.apply(Derrived, arguments);
 		//returning the constructor
@@ -160,10 +183,26 @@
 			baseCtor.apply(this, arguments);
 		}; //automatic constructor if ommited
 
-		WAssert(true, window.intellisense && function WAssertRedirectDefinition() {
+		WAssert(false, window.intellisense && function WAssertRedirectDefinition() {
 			//trigger intellisense on VS2012 when pressing F12 (go to reference) to go to the creator rather than the defaultCtor
 			intellisense.redirectDefinition(Derrived, creatorResult.hasOwnProperty('constructor') ? creatorResult.constructor : creator);
 			intellisense.annotate(Derrived, creatorResult.hasOwnProperty('constructor') ? creatorResult.constructor : baseCtor);
+			creatorResult.constructor = Derrived;//ensure we're forwarding deep base classes constructor's XMLDoc to inherited constructors if they don't provide one
+			Object.getOwnPropertyNames(creatorResult).forEach(function (name) {
+				var f = creatorResult[name];
+				if (typeof f === "function") {
+					intellisense.addEventListener('signaturehelp', function (event) {
+						if (event.target != f) return;
+						var args = [event.functionHelp];
+						var p = baseCtor.prototype;
+						while (p != Object.prototype) {
+							args.push(p.hasOwnProperty(name) ? p[name] : null);
+							p = Object.getPrototypeOf(p);
+						}
+						intellisense.inheritXMLDoc.apply(null, args);
+					});
+				}
+			});
 		});
 		var derrivedPrototype;
 		__.prototype = this.prototype;

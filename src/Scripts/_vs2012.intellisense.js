@@ -548,7 +548,60 @@
 
 		return str;
 	}
-	window.intellisense && intellisense.addEventListener('signaturehelp', function (event) {
+	intellisense.xml2json = xml2json;
+	intellisense.cloneXMLDoc = function (functionHelp, target) {
+		/// <summary>Clones XMLDoc from target to the functionHelp. <br/>This method can only be called from `signaturehelp` event of intellisense <br/>i.e. intellisense.addEventListener('signaturehelp', function (event) {  intellisense.cloneXMLDoc(event.functionHelp, someOtherFunction) }</summary>
+		/// <param name="functionHelp" type="FunctionHelp">See http://msdn.microsoft.com/en-us/library/vstudio/hh874692.aspx#FunctionHelp </param>
+		/// <param name="target" type="Function">Any other function which has XMLDoc comments to copy from</param>
+		if (typeof target === "function") {
+			var f = intellisense.getFunctionComments(target);
+			var xmldoc = f.xmldoc = xml2json.parser(f.inside);
+			if (!xmldoc.signature)
+				xmldoc.signature = [xmldoc];
+			//event.functionHelp.signatures[0].params[0].description == "abcd"; // first parameter's description
+			var signatures = functionHelp.signatures;
+			signatures.splice(0, signatures.length);
+			each(xmldoc.signature, function (index, signature) {
+				var description = signature && signature.summary && signature.summary.__value;
+				var s = {
+					description: description,
+					params: []
+				};
+				if (signature.param) {
+					if (typeof signature.param.push !== "function")
+						signature.param = [signature.param];
+					each(signature.param, function (index, param) {
+						param.description = param.__value;
+						each(["integer", "domElement", "mayBeNull", "elementInteger", "elementDomElement", "elementMayBeNull", "parameterArray", "optional"], function (index, attr) {
+							if (typeof param[attr] === "string")
+								param[attr] = param[attr] == "true" || param[attr] == "1" || param[attr] == true;
+						});
+
+						delete param.__value;
+						s.params.push(param);
+					});
+				}
+				signatures.push(s);
+			});
+			return signatures;
+		}
+	}
+	intellisense.inheritXMLDoc = function (functionHelp, sourceMethod1, sourceMethod2, sourceMethodEtc) {
+		/// <summary>Clones first non-null XMLDoc from provided sourceMethods to the functionHelp <br/>This method can only be called from `signaturehelp` event of intellisense <br/>i.e. intellisense.addEventListener('signaturehelp', function (event) {  intellisense.cloneXMLDoc(event.functionHelp, someOtherFunction) }</summary>
+		/// <param name="functionHelp" type="FunctionHelp">See http://msdn.microsoft.com/en-us/library/vstudio/hh874692.aspx#FunctionHelp </param>
+		/// <param name="sourceMethod1" type="Function">Any other function which has XMLDoc comments to copy from</param>
+		/// <param name="sourceMethod2" type="Function">Any other function which has XMLDoc comments to copy from</param>
+		/// <param name="sourceMethodEtc" type="Function">Any other function which has XMLDoc comments to copy from</param>
+
+		var signatures = functionHelp.signatures;
+		var signature = signatures[0];
+		var baseMethodIndex = 0;
+		while (signatures.length == 1 && !signature.description && ++baseMethodIndex < arguments.length) {
+			intellisense.cloneXMLDoc(functionHelp, arguments[baseMethodIndex]);
+			signature = signatures[0];
+		}
+	}
+	intellisense.addEventListener('signaturehelp', function (event) {
 		var functionHelp = event.functionHelp;
 		var functionName = event && event.functionHelp && event.functionHelp.functionName;
 		if (event.parentObject && typeof event.parentObject === "function"
