@@ -80,6 +80,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="content\scripts\FastClass.min.js.map">
+      <DependentUpon>FastClass.js</DependentUpon>
+    </None>
     <None Include="Package.nuspec">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -105,6 +108,7 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="node-example.js" />
     <Content Include="Scripts\NamespacesAndEnumSupport.js" />
     <Content Include="Scripts\Tests\FastClass.Tests.js" />
     <Content Include="Scripts\Tests\qunit.css" />
