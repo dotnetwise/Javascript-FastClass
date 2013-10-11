@@ -60,7 +60,7 @@ Native javascript inheritance is a pin in the ass. Even if you understand it per
 
 There are a lot of libraries which aim to help you with such that, but the main question is:
 
-What is <a href="http://jsperf.com/js-inheritance-performance/36" target="_blank"><code>the fastest</code></a> vs <a target="_blank" href="https://github.com/njoubert/inheritance.js/blob/master/INHERITANCE.md"><code>most convenient</code></a> (also known as: with the most `[sugar](http://en.wikipedia.org/wiki/Syntactic_sugar)`) to create <a href="http://msdn.microsoft.com/en-us/magazine/ff852808.aspx" target="_blank"><code>Prototypal Inheritance</code></a> with?
+What is <a href="http://jsperf.com/js-inheritance-performance/36" target="_blank"><code>the fastest</code></a> vs <a target="_blank" href="https://github.com/njoubert/inheritance.js/blob/master/INHERITANCE.md"><code>most convenient</code></a> (also known as: with the most <code>[sugar](http://en.wikipedia.org/wiki/Syntactic_sugar)</code>) to create <a href="http://msdn.microsoft.com/en-us/magazine/ff852808.aspx" target="_blank"><code>Prototypal Inheritance</code></a> with?
 
 ## When to use it?
 You might want this library
@@ -80,7 +80,7 @@ function(base, baseCtor) { this.somePrototypeMethod1 =  ...; this.somePrototypeM
 
 * [`Function.prototype.inheritWith(creator)`](#inheritwith-flavour) - **recommended** returns a `plain object` containing the members of the new prototype, including the constructor itself
 
-It makes usage of __proto__ on all new browsers (which makes it blazing fast) except `Internet Explorer` and maybe other ancient browsers where it fallbacks to `for (var key in obj)` statement.
+It makes usage of __proto__ on all new browsers (which makes it blazing fast) except `Internet Explorer <= 10` and maybe other ancient browsers where it fallbacks to `for (var key in obj)` statement.
 
 Note `__proto__` will become standard in <a href="http://javascript.spec.whatwg.org/#object.prototype.__proto__" target="_blank">ECMAScript 6</a>
 ```javascript
