@@ -1,6 +1,6 @@
 {
   "name": "fast-class",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A faster and easier way to define Javascript Prototypal Inheritance: `classes` and `mixins`",
   "main": "FastClass.js",
   "scripts": {
@@ -13,7 +13,7 @@
   "keywords": [
     "javascript",
     "inheritance",
-	"prototype"
+	"prototype",
     "fast",
     "class",
 	"mixin",
@@ -24,8 +24,8 @@
 	"inheirt with",
 	"fast class",
 	"define",
-	"dotnetwise"
-	"dnw",
+	"dotnetwise",
+	"dnw"
   ],
   "author": "DotNetWise <nodejs@dotnetwise.com> (http://www.dotnetwise.com/)",
   "license": "FREE",
