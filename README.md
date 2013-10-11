@@ -2,6 +2,12 @@ Javascript-fastClass
 ====================
 A faster and easier way to define Javascript Prototypal Inheritance: `classes` and `mixins`
 
+<table><tr><th>Node:</th><th>Nuget:</th></tr>
+<tr><td>
+npm install <a href='https://npmjs.org/package/fast-class' target="blank">fast-class</a>
+</td><td>
+Install-Package <a href='http://www.nuget.org/packages/Javascript-FastClass' target="blank">Javascript-FastClass</a>
+</td></tr></table>
 
 ## Performance tests
 *  Among <a href="http://jsperf.com/js-inheritance-performance/36" target="_blank"><code>popular libraries define + usage</code></a> - 3 classes and 3 methods * 500 instances each
@@ -430,6 +436,11 @@ j();//will call the given function and then will trigger a failed assert with me
 Beside GitHub, you can download it as a <a href="http://nuget.org/packages/Javascript-FastClass/" target="_blank"><code>Nuget package</code></a> in Visual Studio from<a href="http://nuget.org/packages/Javascript-FastClass/" target="_blank"><code>here</code></a>
 ```javascript
 Install-Package Javascript-FastClass
+```
+
+There is also a <a href='https://npmjs.org/package/fast-class' target="blank">nodejs version</a>
+```javascript
+npm install fast-class
 ```
 
 ## What's next?
