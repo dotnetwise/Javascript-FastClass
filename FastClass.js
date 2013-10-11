@@ -1,6 +1,7 @@
 ﻿////For performance tests please see: http://jsperf.com/js-inheritance-performance/34 + http://jsperf.com/js-inheritance-performance/35 + http://jsperf.com/js-inheritance-performance/36
 
 (function selfCall() {
+	var isNode = typeof global != "undefined";
 	if (!String.prototype.format) {
 		var regexes = {};
 		String.prototype.format = function format(parameters) {
@@ -23,7 +24,9 @@
 		}
 	}
 	///#DEBUG
-	window.WAssert = function WAssert(trueishCondition, message, arg1, arg2, argEtc) {
+	if (typeof window != "undefined")
+		window.WAssert = WAssert;
+	function WAssert(trueishCondition, message, arg1, arg2, argEtc) {
 		/// <summary>Returns an `assert function` if the condition is false an a `noop function` (a function which does nothing) if the condition is true. <br/>
 		///  WAsserts will not be included in production code in anyways, hence the minifier will remove all the WAssert calls<br/><br/>
 		///  You always need to call the WAssert function twice since the first call always returns a function i.e. WAssert(false, "{0} failed", "Condition")()
@@ -38,7 +41,7 @@
 		if (typeof trueishCondition === "function" ? !trueishCondition.apply(this, arguments) : !trueishCondition) {
 			var parameters = Array.prototype.slice.call(arguments, 1);
 			var msg = typeof message == "string" ? String.format.apply(message, parameters) : message;
-			return window.console && !console.__throwErrorOnAssert && console.assert && console.assert.bind && console.assert.bind(console, trueishCondition, msg) || function consoleAssertThrow() { throw msg; };
+			return typeof console != "undefined" && !console.__throwErrorOnAssert && console.assert && console.assert.bind && console.assert.bind(console, trueishCondition, msg) || function consoleAssertThrow() { throw msg; };
 		}
 		return __;
 	};
@@ -115,7 +118,7 @@
 		//setting the derrivedPrototype to constructor's prototype
 		Derrived.prototype = derrivedProrotype;
 
-		WAssert(false, window.intellisense && function WAssertRedirectDefinition() {
+		WAssert(false, !isNode && window.intellisense && function WAssertRedirectDefinition() {
 			//trigger intellisense on VS2012 when pressing F12 (go to reference) to go to the creator rather than the defaultCtor
 			var creatorResult = derrivedProrotype;
 			intellisense.redirectDefinition(Derrived, creatorResult.hasOwnProperty('constructor') ? creatorResult.constructor : creator);
@@ -140,6 +143,7 @@
 
 		creator = null;//set the first parameter to null as we have already 'shared' the base prototype into derrivedPrototype in the creator function by setting creator.prototype = base on above
 		arguments.length > 1 && Function_prototype.define.apply(Derrived, arguments);
+		Derrived.constructor = Derrived;
 		//returning the constructor
 		return Derrived;
 	};
@@ -183,7 +187,7 @@
 			baseCtor.apply(this, arguments);
 		}; //automatic constructor if ommited
 
-		WAssert(false, window.intellisense && function WAssertRedirectDefinition() {
+		WAssert(false, !isNode && window.intellisense && function WAssertRedirectDefinition() {
 			//trigger intellisense on VS2012 when pressing F12 (go to reference) to go to the creator rather than the defaultCtor
 			intellisense.redirectDefinition(Derrived, creatorResult.hasOwnProperty('constructor') ? creatorResult.constructor : creator);
 			intellisense.annotate(Derrived, creatorResult.hasOwnProperty('constructor') ? creatorResult.constructor : baseCtor);
@@ -211,6 +215,7 @@
 
 		creator = creatorResult;//change the first parameter with the creatorResult
 		Function_prototype.define.apply(Derrived, arguments);
+		Derrived.constructor = Derrived;
 
 		return Derrived;
 	} :// when browser supports __proto__ setting it is way faster than iterating the object
@@ -256,7 +261,7 @@
 		derrivedPrototype.__proto__ = this.prototype;
 		creator = null;//set the first parameter to null as we have already 'shared' the base prototype into derrivedPrototype by using __proto__
 		arguments.length > 1 && Function_prototype.define.apply(Derrived, arguments);
-
+		Derrived.constructor = Derrived;
 		return Derrived;
 	};
 	Function_prototype.define = function define(prototype, mixins) {
@@ -297,7 +302,7 @@
 								var msg = "The '{0}' mixin defines a '{1}' named '{2}' which is already defined on the class {3}!"
 									.format(isFunction && mixin.name || (index - 1), typeof mixinValue[key] === "function" ? "function" : "member", key, constructor.name ? ("'" + constructor.name + "'") : '');
 								console.log(msg)
-								window.intellisense && intellisense.logMessage(msg);
+								!isNode && window.intellisense && intellisense.logMessage(msg);
 								throw msg;
 							}
 							//set a custom glyph icon for mixin functions
@@ -309,7 +314,7 @@
 					}
 			}
 		});
-		WAssert(true, window.intellisense && function WAssertExtending() {
+		WAssert(true, !isNode && window.intellisense && function WAssertExtending() {
 			//trigger intellisense on VS2012 for base class members, because same as IE, VS2012 doesn't support __proto__
 			//for (var i in extendeePrototype)
 			//	if (!creatorResult.hasOwnProperty(i)) {
@@ -353,7 +358,7 @@
 			constructor = func.hasOwnProperty("constructor") ? func.constructor : function constructorDefaultObjConstructor() { };
 
 			constructor.prototype = func;
-			WAssert(true, window.intellisense && function WAssert() {
+			WAssert(true, !isNode && window.intellisense && function WAssert() {
 				//VS2012 intellisense don't forward the actual creator as the function's prototype b/c we want to "inject" constructor's members into it
 				function clone() {
 					for (var i in func)
@@ -381,9 +386,10 @@
 		//we are sharing constructor's prototype
 		result.prototype = constructor.prototype;
 		//forward the VS2012 intellisense to the given constructor function
-		WAssert(true, window.intellisense && function WAssert() {
+		WAssert(true, !isNode && window.intellisense && function WAssert() {
 			window.intellisense && intellisense.redirectDefinition(result, constructor);
 		});
+		result.constructor = result.prototype.constructor = constructor.constructor = constructor.prototype.constructor = result;
 		return result;
 	};
 
@@ -413,7 +419,7 @@
 				WAssert(false, message)();
 			else defaultAbstractMethod();
 		}).defineStatic({ abstract: true }) : defaultAbstractMethod;
-		WAssert(true, window.intellisense && function () {
+		WAssert(true, !isNode && window.intellisense && function () {
 			if (result != defaultAbstractMethod) {
 				if (typeof message === "function")
 					intellisense.redirectDefinition(result, message);
@@ -432,7 +438,7 @@
 		if (objectInstance && !objectInstance.__initMixins__) {
 			var p = objectInstance, mixins, length, i, mixin, calledMixins = {};
 			objectInstance.__initMixins__ = 1;
-			WAssert(true, window.intellisense && function WAssert() {
+			WAssert(true, !isNode && window.intellisense && function WAssert() {
 				//hide __initMixins from VS2012 intellisense
 				objectInstance.__initMixins__ = { __hidden: true };
 			});
@@ -469,7 +475,6 @@
 	}
 
 })();
-
 ////Uncomment this for a quick demo & self test
 //////////////////OPTION 1: inheritWith////////////////////////
 ////Using Define: 
@@ -533,7 +538,7 @@
 //selfTest();
 
 //////////////////OPTION 2: fastClass////////////////////////
-//Using Define:
+////Using Define:
 
 ////Aternative for Function.define we can do this:
 //var A = function (val) {
@@ -547,7 +552,7 @@
 //	}
 //});
 
-//To define the top level (first) function there is a sugar (as well as the above alternative)
+////To define the top level (first) function there is a sugar (as well as the above alternative)
 //var A = Function.define(function A(val) {
 //     // when we are definin a top function with Function.define we DON'T need to call initMixins because they will be called automatically for us
 //	this.val = val;
@@ -584,23 +589,23 @@
 ////selfTest();
 
 //function selfTest() {
-//	window.a = new A("a");
+//	var a = new A("a");
 //	a.method1("x", "y", "z");
 //	console.assert(a.x == "x", "a.x should be set to 'x'");
 //	console.assert(a.y == "y", "a.y should be set to 'y'");
 //	console.assert(a.z == "z", "a.z should be set to 'z'");
-//	window.b = new B("b");
+//	var b = new B("b");
 //	b.method1("y", "z");
 //	console.assert(b.x == "x", "b.x should be set to 'x'");
 //	console.assert(b.y == "y", "b.y should be set to 'y'");
 //	console.assert(b.z == "z", "b.z should be set to 'z'");
-//	window.c = new C("c");
+//	var c = new C("c");
 //	c.method1("z");
 //	console.assert(c.x == "x", "c.x should be set to 'x'");
 //	console.assert(c.y == "y", "c.y should be set to 'y'");
 //	console.assert(c.z == "z", "c.z should be set to 'z'");
 
-//	window.d = new D("d");
+//	var d = new D("d");
 //	d.method1("w");
 //	console.assert(d.x == "x", "d.x should be set to 'x'");
 //	console.assert(d.y == "y", "d.y should be set to 'y'");
@@ -620,11 +625,11 @@
 //		"a instanceof A": true,
 //		"a instanceof B": false,
 //		"a instanceof C": false,
-//		"A.prototype.constructor === a.constructor && a.constructor === A": true,
-//		"B.prototype.constructor === b.constructor && b.constructor === B": true,
-//		"C.prototype.constructor === c.constructor && c.constructor === C": true,
-//		"D.prototype.constructor === d.constructor && d.constructor === D": true,
-//	}
+//"A.prototype.constructor === a.constructor && a.constructor === A.constructor": true,//this should not equal to A itself due to mixins base function
+//"B.prototype.constructor === b.constructor && b.constructor === B && B == B.constructor": true,
+//"C.prototype.constructor === c.constructor && c.constructor === C && B == B.constructor": true,
+//"D.prototype.constructor === d.constructor && d.constructor === D && B == B.constructor": true,
+//}
 //	for (var expectedKey in expecteds) {
 //		var expected = expecteds[expectedKey];
 //		var actual = eval(expectedKey);//using eval for quick demo self test purposing -- using eval is not recommended otherwise
@@ -658,6 +663,6 @@
 //}, Point//specifying zero or more mixins - comma separated
 //);
 
-//var e = new B();
+//var e = new E();
 //e.x(2);//sets e.point.x to 2
 //console.log("mixin Point.x expected to return 2. Actual: ", e.x());//returns 2
