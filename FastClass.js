@@ -273,15 +273,24 @@
 	};
 	Function_prototype.define = function define(prototype, mixins) {
 		/// <summary>Define members on the prototype of the given function with the custom methods and fields specified in the prototype parameter.</summary>
-		/// <param name="prototype" type="Function || Plain Object">{} or function(prototype, ctor) {}<br/>A custom object with the methods or properties to be added on Extendee.prototype</param>
+		/// <param name="prototype" type="Function || Plain Object">{} or function(prototype, ctor) {}<br/>A custom object with the methods or properties to be added on Extendee.prototype<br/><br/>
+		/// You can sepcify enumerable: false, which will define the members as non-enumerable making use of Object.defineProperty(this, key, {enumerable: false, value: copyPropertiesFrom[key]})</summary>
+		///</param>
 		/// <param name="mixins"  type="Function || Plain Object" optional="true" parameterArray="true">Specify one ore more mixins to be added to this function's prototype. <br/>A Mixin is either a function which returns a plain object, or a plan object in itself. It contains method or properties to be added to this function's prototype</param>
 		var constructor = this;
 		var extendeePrototype = this.prototype;
 		var creatorResult = prototype;
+		var key, enumerable;
 		if (prototype) {
 			if (typeof prototype === "function")
 				prototype = prototype.call(extendeePrototype, this.prototype, this);
-			for (var key in prototype)
+			if (prototype.enumerable === false) {
+				delete prototype.enumerable;
+				for (key in prototype)
+					Object.defineProperty(extendeePrototype, key, { enumerable: false, value: prototype[key] });
+				prototype.enumerable = false;
+			}
+			else for (key in prototype)
 				extendeePrototype[key] = prototype[key];
 		}
 		prototype = null;
@@ -409,11 +418,20 @@
 	};
 
 	Function_prototype.defineStatic = function (copyPropertiesFrom) {
-		/// <summary>Copies all the members of the given object, including those on its prototype if any, to this function (and not on its prototype)<br/>For extending this functions' prototype use .define()</summary>
-		/// <param name="copyPropertiesFrom" type="Object">The object to copy the properties from</param>
-		if (copyPropertiesFrom)
-			for (var i in copyPropertiesFrom) {
-				this[i] = copyPropertiesFrom[i];
+		/// <summary>Copies all the members of the given object, including those on its prototype if any, to this function (and not on its prototype)<br/>For extending this functions' prototype use .define()
+		/// <param name="copyPropertiesFrom" type="Object">The object to copy the properties from<br/><br/>
+		/// You can sepcify enumerable: false, which will define the members as non-enumerable making use of Object.defineProperty(this, key, {enumerable: false, value: copyPropertiesFrom[key]})</summary>
+		/// </param>
+		var key;
+		if (typeof copyPropertiesFrom == "object")
+			if (copyPropertiesFrom.enumerable === false) {
+				delete copyPropertiesFrom.enumerable;
+				for (key in copyPropertiesFrom)
+					Object.defineProperty(this, key, { enumerable: false, value: copyPropertiesFrom[key] });
+				copyPropertiesFrom.enumerable = false;
+			}
+			for (key in copyPropertiesFrom) {
+				this[key] = copyPropertiesFrom[key];
 			}
 		return this;
 	}
