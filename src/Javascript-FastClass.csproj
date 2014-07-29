@@ -87,6 +87,7 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Package.tt</DependentUpon>
+      <SubType>Designer</SubType>
     </None>
     <None Include="Package.tt">
       <Generator>TextTemplatingFileGenerator</Generator>

@@ -1,6 +1,6 @@
 {
   "name": "fast-class",
-  "version": "1.1011.122041",
+  "version": "1.729.121805",
   "description": "A faster and easier way to define Javascript Prototypal Inheritance: `classes` and `mixins`",
   "main": "FastClass.js",
   "scripts": {

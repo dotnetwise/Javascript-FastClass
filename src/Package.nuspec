@@ -3,15 +3,14 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
     <id>Javascript-FastClass</id>
-    <version><![CDATA[1.0.1011.122041]]></version>
+    <version><![CDATA[1.1.729.121805]]></version>
     <title>Fast Class Javascript Inheritance</title>
     <authors>DotNetWise</authors>
     <description>A fast and lightest prototype inheritance when you can't use any complied library such as TypeScript or Google Closure</description>
     <owners>DotNetWise</owners>
     <releaseNotes>
-      Returning base ctor's result || this on default constructors
-      Dropping WAssert calls when minified with uglifyjs2
-      Added support for Node
+      Better intellisense support for VS2013 (since VS2012 supports __proto__)
+      inheritWith creator now automatically shows members added on constructor and inherited constructors
       Made use of intellisense.inheritXMLDoc so we automatically inherit XMLDoc from the first base class that has has one specified
       Fixed inheritWith to accept an object when __proto__ is available
       Added inheritWith support to only provided an object when you don't need to call the base or baseCtor, or you call them explicitely
@@ -34,7 +33,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <iconUrl>https://raw.github.com/wiki/dotnetwise/Javascript-FastClass/images/Icon32.png</iconUrl>
     <!--<licenseUrl></licenseUrl>-->
-    <copyright>Copyright DotNetWise 2013. This is an open-source project, you can edit and use it for free. Share!</copyright>
+    <copyright>Copyright DotNetWise 2014. This is an open-source project, you can edit and use it for free. Share!</copyright>
     <dependencies>
     </dependencies>
     <frameworkAssemblies>

@@ -71,7 +71,7 @@ You might want this library
 e.g. <a href="https://developers.google.com/closure/" target="_blank">Google Closure</a>, <a href="http://www.typescriptlang.org/Playground/" target="_blank">TypeScript</a>, <a href="http://arcturo.github.com/library/coffeescript/03_classes.html" target="_blank">Coffee Script</a> etc.
 
 ## What is it? 
-FastClass is a very tiny library (~1KB minified and gzipped) that helps you quickly derrive your `classes` so to speak. 
+FastClass is a very tiny library (<1.5KB minified and gzipped) that helps you quickly derrive your `classes` so to speak. 
 It comes in two flavours:
 * [`Function.prototype.fastClass(creator)`](#fastclass-flavour) - sets the `Base.prototype` to the `creator` function and then calls `new creator(this.prototype, this)`
 ```javascript

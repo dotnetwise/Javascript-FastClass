@@ -1,4 +1,4 @@
-﻿////For performance tests please see: http://jsperf.com/js-inheritance-performance/34 + http://jsperf.com/js-inheritance-performance/35 + http://jsperf.com/js-inheritance-performance/36
+////For performance tests please see: http://jsperf.com/js-inheritance-performance/34 + http://jsperf.com/js-inheritance-performance/35 + http://jsperf.com/js-inheritance-performance/36
 
 (function selfCall() {
 	var isNode = typeof global != "undefined";
@@ -42,7 +42,7 @@
 		if (typeof trueishCondition === "function" ? !trueishCondition.apply(this, arguments) : !trueishCondition) {
 			var parameters = Array.prototype.slice.call(arguments, 1);
 			var msg = typeof message == "string" ? String.format.apply(message, parameters) : message;
-			return typeof console != "undefined" && !console.__throwErrorOnAssert && console.assert && console.assert.bind && console.assert.bind(console, trueishCondition, msg) || function consoleAssertThrow() { throw msg; };
+			return typeof console != "undefined" && !console.__throwErrorOnAssert && console.assert && console.assert.bind && console.assert.bind(console, trueishCondition, msg) || function consoleAssertThrow() { throw new Error(msg); };
 		}
 		return __;
 	};
@@ -120,6 +120,7 @@
 		//setting the derrivedPrototype to constructor's prototype
 		Derrived.prototype = derrivedProrotype;
 
+		///#DEBUG
 		//>>excludeStart("WASSERT", true);
 		WAssert(false, !isNode && window.intellisense && function WAssertRedirectDefinition() {
 			//trigger intellisense on VS2012 when pressing F12 (go to reference) to go to the creator rather than the defaultCtor
@@ -144,13 +145,14 @@
 			});
 		});
 		//>>excludeEnd("WASSERT");
+		///#ENDDEBUG 
 
 
 		creator = null;//set the first parameter to null as we have already 'shared' the base prototype into derrivedPrototype in the creator function by setting creator.prototype = base on above
 		arguments.length > 1 && Function_prototype.define.apply(Derrived, arguments);
 		Derrived.constructor = Derrived;
 		//returning the constructor
-		return Derrived;
+		return Derrived; 
 	};
 
 	Function_prototype.inheritWith = !supportsProto ? function inheritWith(creator, mixins) {
@@ -191,7 +193,7 @@
 		var Derrived = creatorResult.hasOwnProperty('constructor') ? creatorResult.constructor : function inheritWithConstructor() {
 			return baseCtor.apply(this, arguments) || this;
 		}; //automatic constructor if ommited
-
+		///#DEBUG
 		//>>excludeStart("WASSERT", true);
 		WAssert(false, !isNode && window.intellisense && function WAssertRedirectDefinition() {
 			//trigger intellisense on VS2012 when pressing F12 (go to reference) to go to the creator rather than the defaultCtor
@@ -213,8 +215,10 @@
 					});
 				}
 			});
+			$.extend(true, creatorResult, new Derrived);
 		});
 		//>>excludeEnd("WASSERT");
+		///#ENDDEBUG 
 		var derrivedPrototype;
 		__.prototype = this.prototype;
 		Derrived.prototype = derrivedPrototype = new __;
@@ -260,28 +264,64 @@
 		/// <param name="mixins"  type="Function || Plain Object" optional="true" parameterArray="true">Specify one ore more mixins to be added to the derrived function's prototype. <br/>A Mixin is either a function which returns a plain object, or a plan object in itself. It contains method or properties to be added to this function's prototype</param>
 		/// </signature>
 		var baseCtor = this;
-		var derrivedPrototype = (typeof creator === "function" ? creator.call(this, this.prototype, this) : creator) || {};
-		var Derrived = derrivedPrototype.hasOwnProperty('constructor') ? derrivedPrototype.constructor : function inheritWithProtoDefaultConstructor() {
+		var creatorResult = (typeof creator === "function" ? creator.call(this, this.prototype, this) : creator) || {};
+		var Derrived = creatorResult.hasOwnProperty('constructor') ? creatorResult.constructor : function inheritWithProtoDefaultConstructor() {
 			return baseCtor.apply(this, arguments) || this;
 		}; //automatic constructor if ommited
-		Derrived.prototype = derrivedPrototype;
-		derrivedPrototype.__proto__ = this.prototype;
-		creator = null;//set the first parameter to null as we have already 'shared' the base prototype into derrivedPrototype by using __proto__
+		///#DEBUG
+		//>>excludeStart("WASSERT", true);
+		WAssert(false, !isNode && window.intellisense && function WAssertRedirectDefinition() {
+			//trigger intellisense on VS2012 when pressing F12 (go to reference) to go to the creator rather than the defaultCtor
+			intellisense.logMessage("cucu rucu");
+			creatorResult.cucu = 1;
+			intellisense.redirectDefinition(Derrived, creatorResult.hasOwnProperty('constructor') ? creatorResult.constructor : creator);
+			intellisense.annotate(Derrived, creatorResult.hasOwnProperty('constructor') ? creatorResult.constructor : baseCtor);
+			creatorResult.constructor = Derrived;//ensure we're forwarding deep base classes constructor's XMLDoc to inherited constructors if they don't provide one
+			Object.getOwnPropertyNames(creatorResult).forEach(function (name) {
+				var f = creatorResult[name];
+				if (typeof f === "function") {
+					intellisense.addEventListener('signaturehelp', function (event) {
+						if (event.target != f) return;
+						var args = [event.functionHelp];
+						var p = baseCtor.prototype;
+						while (p != Object.prototype) {
+							args.push(p.hasOwnProperty(name) ? p[name] : null);
+							p = Object.getPrototypeOf(p);
+						}
+						intellisense.inheritXMLDoc.apply(null, args);
+					});
+				}
+			});
+			$.extend(true, creatorResult, new Derrived);
+		});
+		//>>excludeEnd("WASSERT");
+		///#ENDDEBUG 
+		Derrived.prototype = creatorResult;
+		creatorResult.__proto__ = this.prototype;
+		creator = null;//set the first parameter to null as we have already 'shared' the base prototype into creatorResult by using __proto__
 		arguments.length > 1 && Function_prototype.define.apply(Derrived, arguments);
 		Derrived.constructor = Derrived;
 		return Derrived;
 	};
 	Function_prototype.define = function define(prototype, mixins) {
 		/// <summary>Define members on the prototype of the given function with the custom methods and fields specified in the prototype parameter.</summary>
-		/// <param name="prototype" type="Function || Plain Object">{} or function(prototype, ctor) {}<br/>A custom object with the methods or properties to be added on Extendee.prototype</param>
+		/// <param name="prototype" type="Function || Plain Object">{} or function(prototype, ctor) {}<br/>A custom object with the methods or properties to be added on Extendee.prototype<br/><br/>
+		/// You can sepcify enumerable: false, which will define the members as non-enumerable making use of Object.defineProperty(this, key, {enumerable: false, value: copyPropertiesFrom[key]})
+		///</param>
 		/// <param name="mixins"  type="Function || Plain Object" optional="true" parameterArray="true">Specify one ore more mixins to be added to this function's prototype. <br/>A Mixin is either a function which returns a plain object, or a plan object in itself. It contains method or properties to be added to this function's prototype</param>
 		var constructor = this;
 		var extendeePrototype = this.prototype;
 		var creatorResult = prototype;
+		var key, enumerable;
 		if (prototype) {
 			if (typeof prototype === "function")
 				prototype = prototype.call(extendeePrototype, this.prototype, this);
-			for (var key in prototype)
+			if (prototype.enumerable === false) {
+				for (key in prototype)
+					if (key !== 'enumerable')
+						Object.defineProperty(extendeePrototype, key, { enumerable: false, value: prototype[key] });
+			}
+			else for (key in prototype)
 				extendeePrototype[key] = prototype[key];
 		}
 		prototype = null;
@@ -300,6 +340,7 @@
 				for (var key in mixinValue)
 					if (key != "constructor" && key != "prototype") {
 						//intellisense.logMessage("injecting " + key + " into " + extendeePrototype.name);
+						///#DEBUG
 						//>>excludeStart("WASSERT", true);
 						WAssert(true, function WAssertInjecting() {
 							//trigger intellisense on VS2012 for mixins
@@ -311,7 +352,7 @@
 									.format(isFunction && mixin.name || (index - 1), typeof mixinValue[key] === "function" ? "function" : "member", key, constructor.name ? ("'" + constructor.name + "'") : '');
 								console.log(msg)
 								!isNode && window.intellisense && intellisense.logMessage(msg);
-								throw msg;
+								throw new Error(msg);
 							}
 							//set a custom glyph icon for mixin functions
 							if (typeof mixinValue[key] === "function" && mixin != mixinValue[key] && mixin != constructor && mixin !== extendeePrototype) {
@@ -319,10 +360,12 @@
 							}
 						});
 						//>>excludeEnd("WASSERT");
+						///#ENDDEBUG 
 						extendeePrototype[key] = mixinValue[key];
 					}
 			}
 		});
+		///#DEBUG
 		//>>excludeStart("WASSERT", true);
 		WAssert(true, !isNode && window.intellisense && function WAssertExtending() {
 			//trigger intellisense on VS2012 for base class members, because same as IE, VS2012 doesn't support __proto__
@@ -346,6 +389,7 @@
 
 		});
 		//>>excludeEnd("WASSERT");
+		///#ENDDEBUG 
 		return this;
 	}
 
@@ -369,6 +413,7 @@
 			constructor = func.hasOwnProperty("constructor") ? func.constructor : function constructorDefaultObjConstructor() { };
 
 			constructor.prototype = func;
+			///#DEBUG
 			//>>excludeStart("WASSERT", true);
 			WAssert(true, !isNode && window.intellisense && function WAssert() {
 				//VS2012 intellisense don't forward the actual creator as the function's prototype b/c we want to "inject" constructor's members into it
@@ -381,6 +426,7 @@
 				constructor.prototype = new clone;
 			});
 			//>>excludeEnd("WASSERT");
+			///#ENDDEBUG 
 
 
 			applyDefine = true;
@@ -399,28 +445,40 @@
 		//we are sharing constructor's prototype
 		result.prototype = constructor.prototype;
 		//forward the VS2012 intellisense to the given constructor function
+		///#DEBUG
 		//>>excludeStart("WASSERT", true);
 		WAssert(true, !isNode && window.intellisense && function WAssert() {
 			window.intellisense && intellisense.redirectDefinition(result, constructor);
 		});
 		//>>excludeEnd("WASSERT");
+		///#ENDDEBUG 
 		result.constructor = result.prototype.constructor = constructor.constructor = constructor.prototype.constructor = result;
 		return result;
 	};
 
 	Function_prototype.defineStatic = function (copyPropertiesFrom) {
-		/// <summary>Copies all the members of the given object, including those on its prototype if any, to this function (and not on its prototype)<br/>For extending this functions' prototype use .define()</summary>
-		/// <param name="copyPropertiesFrom" type="Object">The object to copy the properties from</param>
-		if (copyPropertiesFrom)
-			for (var i in copyPropertiesFrom) {
-				this[i] = copyPropertiesFrom[i];
+		/// <summary>Copies all the members of the given object, including those on its prototype if any, to this function (and not on its prototype)<br/>For extending this functions' prototype use .define()
+		/// <param name="copyPropertiesFrom" type="Object">The object to copy the properties from<br/><br/>
+		/// You can sepcify enumerable: false, which will define the members as non-enumerable making use of Object.defineProperty(this, key, {enumerable: false, value: copyPropertiesFrom[key]})</summary>
+		/// </param>
+		var key;
+		if (typeof copyPropertiesFrom == "object")
+			if (copyPropertiesFrom.enumerable === false) {
+				for (key in copyPropertiesFrom)
+					if (key !== 'enumerable')
+					Object.defineProperty(this, key, { enumerable: false, configurable: true, value: copyPropertiesFrom[key] });
+			}
+			for (key in copyPropertiesFrom) {
+				this[key] = copyPropertiesFrom[key];
 			}
 		return this;
 	}
 	function defaultAbstractMethod() {
+		///#DEBUG
 		//>>excludeStart("WASSERT", true);
 		WAssert(false, "Not implemented")();
 		//>>excludeEnd("WASSERT");
+		///#ENDDEBUG 
 	}
 	defaultAbstractMethod.defineStatic({ abstract: true });
 	Function.abstract = function (message, func) {
@@ -434,14 +492,15 @@
 				func.apply(this, arguments);
 			///#DEBUG
 			//>>excludeStart("WASSERT", true);
-			if (typeof message === "string")
+			if (typeof message === "xstring")
 				WAssert(false, message)();
 			else defaultAbstractMethod();
 			//>>excludeEnd("WASSERT");
-			///#ENDDEBUG
+			///#ENDDEBUG 
 
 		}).defineStatic({ abstract: true }) : defaultAbstractMethod;
 
+		///#DEBUG
 		//>>excludeStart("WASSERT", true);
 		WAssert(true, !isNode && window.intellisense && function () {
 			if (result != defaultAbstractMethod) {
@@ -452,11 +511,12 @@
 			}
 		});
 		//>>excludeEnd("WASSERT");
+		///#ENDDEBUG 
 
 		return result;
 	}
 
-	Function.initMixins = function initMixins(objectInstance) {
+	Function.initMixins = supportsProto ? function initMixins(objectInstance) {
 		/// <signature>
 		/// <summary>Initializes the mixins on all of the prototypes of the given object instance<br/>This should only be called once per object, usually in the first constructor (the most base class)</summary>
 		/// <param name="objectInstance" type="Object">The object instance for which the mixins needs to be initialized</param>
@@ -464,14 +524,16 @@
 		if (objectInstance && !objectInstance.__initMixins__) {
 			var p = objectInstance, mixins, length, i, mixin, calledMixins = {};
 			objectInstance.__initMixins__ = 1;
+			///#DEBUG
 			//>>excludeStart("WASSERT", true);
 			WAssert(true, !isNode && window.intellisense && function WAssert() {
 				//hide __initMixins from VS2012 intellisense
 				objectInstance.__initMixins__ = { __hidden: true };
 			});
 			//>>excludeEnd("WASSERT");
+			///#ENDDEBUG 
 			while (p) {
-				p = supportsProto ? p.__proto__ : Object.getPrototypeOf(p);
+				p = p.__proto__;
 				if (p && p.hasOwnProperty("__mixins__") && (mixins = p.__mixins__) && (length = mixins.length))
 					for (i = 0; mixin = mixins[i], i < length; i++) {
 						//WAssert(true, window.intellisense && function WAssert() {
@@ -487,9 +549,44 @@
 						}
 					}
 			}
-			delete objectInstance.__initMixins__;
+			objectInstance.__initMixins__ = undefined;
 		}
-	};
+	}: function initMixinsWithoutProto(objectInstance) {
+		/// <signature>
+		/// <summary>Initializes the mixins on all of the prototypes of the given object instance<br/>This should only be called once per object, usually in the first constructor (the most base class)</summary>
+		/// <param name="objectInstance" type="Object">The object instance for which the mixins needs to be initialized</param>
+		/// </signature>
+		if (objectInstance && !objectInstance.__initMixins__) {
+			var p = objectInstance, mixins, length, i, mixin, calledMixins = {};
+			objectInstance.__initMixins__ = 1;
+			///#DEBUG
+			//>>excludeStart("WASSERT", true);
+			WAssert(true, !isNode && window.intellisense && function WAssert() {
+				//hide __initMixins from VS2012 intellisense
+				objectInstance.__initMixins__ = { __hidden: true };
+			});
+			//>>excludeEnd("WASSERT");
+			///#ENDDEBUG 
+			while (p) {
+				p = Object.getPrototypeOf(p);
+				if (p && p.hasOwnProperty("__mixins__") && (mixins = p.__mixins__) && (length = mixins.length))
+					for (i = 0; mixin = mixins[i], i < length; i++) {
+						//WAssert(true, window.intellisense && function WAssert() {
+						//	//for correct VS2012 intellisense, at the time of mixin declaration we need to execute new mixin() rather than mixin.call(objectInstance, p, p.constructor) otherwise the glyph icons will look like they are defined on mixin / prototype rather than on the mixin itself
+						//	if (!(mixin in calledMixins)) {
+						//		calledMixins[mixin] = 1;
+						//		new mixin(p, p.constructor);
+						//	}
+						//});
+						if (!(mixin in calledMixins)) {
+							calledMixins[mixin] = 1;
+							mixin.call(objectInstance, p, p.constructor);
+						}
+					}
+			}
+			objectInstance.__initMixins__ = undefined;
+		}
+	};;
 
 	if (Object_defineProperties) {
 		var o = {
