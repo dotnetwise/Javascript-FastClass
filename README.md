@@ -2,6 +2,12 @@ Javascript-fastClass
 ====================
 A faster and easier way to define Javascript Prototypal Inheritance: `classes` and `mixins`
 
+<table><tr><th>Node:</th><th>Nuget:</th></tr>
+<tr><td>
+npm install <a href='https://npmjs.org/package/fast-class' target="blank">fast-class</a>
+</td><td>
+Install-Package <a href='http://www.nuget.org/packages/Javascript-FastClass' target="blank">Javascript-FastClass</a>
+</td></tr></table>
 
 ## Performance tests
 *  Among <a href="http://jsperf.com/js-inheritance-performance/36" target="_blank"><code>popular libraries define + usage</code></a> - 3 classes and 3 methods * 500 instances each
@@ -56,7 +62,7 @@ toyota.draw();
 <img src="../../wiki/images/NugetIcon.png"/>
 </div>
 
-Native javascript inheritance is a pin in the ass. Even if you understand it perfectly it still requires some hideous repetivie code.
+Native javascript inheritance is a pin in the ass. Even if you understand it perfectly it still requires some hideous repetitive code.
 
 There are a lot of libraries which aim to help you with such that, but the main question is:
 
@@ -71,7 +77,7 @@ You might want this library
 e.g. <a href="https://developers.google.com/closure/" target="_blank">Google Closure</a>, <a href="http://www.typescriptlang.org/Playground/" target="_blank">TypeScript</a>, <a href="http://arcturo.github.com/library/coffeescript/03_classes.html" target="_blank">Coffee Script</a> etc.
 
 ## What is it? 
-FastClass is a very tiny library (<1.5KB minified and gzipped) that helps you quickly derrive your `classes` so to speak. 
+FastClass is a very tiny library (~1KB minified and gzipped) that helps you quickly derive your `classes` so to speak. 
 It comes in two flavours:
 * [`Function.prototype.fastClass(creator)`](#fastclass-flavour) - sets the `Base.prototype` to the `creator` function and then calls `new creator(this.prototype, this)`
 ```javascript
@@ -129,7 +135,7 @@ var A = Function.define(function(name){
 }
 ```
 
-Alternatively you can pass an object with the costructor function specified (similar syntax to `.inheritWith`)
+Alternatively you can pass an object with the constructor function specified (similar syntax to `.inheritWith`)
 ```javascript
 var A = Function.define({
     constructor: function(name) {//the constructor itself can be even missing. If so we will add one for you!
@@ -144,9 +150,9 @@ All of the above methods are doing the same thing. You decide which one better s
 
 ## Inheritance
 
-A classical example to use inheritance when you have a base class called `Figure` and a derrived class called `Square`.
+A classical example to use inheritance when you have a base class called `Figure` and a derived class called `Square`.
 
-#### `.fastClass` flvaour
+#### `.fastClass` flavour
 
 To define the `derrived class` Square:
 ```javascript
@@ -430,6 +436,11 @@ j();//will call the given function and then will trigger a failed assert with me
 Beside GitHub, you can download it as a <a href="http://nuget.org/packages/Javascript-FastClass/" target="_blank"><code>Nuget package</code></a> in Visual Studio from<a href="http://nuget.org/packages/Javascript-FastClass/" target="_blank"><code>here</code></a>
 ```javascript
 Install-Package Javascript-FastClass
+```
+
+There is also a <a href='https://npmjs.org/package/fast-class' target="blank">nodejs version</a>
+```javascript
+npm install fast-class
 ```
 
 ## What's next?
