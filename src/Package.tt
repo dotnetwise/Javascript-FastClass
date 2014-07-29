@@ -11,7 +11,7 @@
     <description>A fast and lightest prototype inheritance when you can't use any complied library such as TypeScript or Google Closure</description>
     <owners>DotNetWise</owners>
     <releaseNotes>
-      Better intellisense support for VS2013 (since VS2012 supports __proto__)
+      Better intellisense support for VS2013 (since VS2013 supports __proto__)
       inheritWith creator now automatically shows members added on constructor and inherited constructors
       Made use of intellisense.inheritXMLDoc so we automatically inherit XMLDoc from the first base class that has has one specified
       Fixed inheritWith to accept an object when __proto__ is available
