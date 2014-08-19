@@ -34,7 +34,7 @@ var Car = Vechicle.inheritWith(function(base, baseCtor)){//define the "derrived 
             base.draw.call(this);//optionally call the base class' draw method
         }
     }
-}, Engine);//optionally specify extra mixins whose prortotype members will be copied to Car.prototype
+}, Engine);//optionally specify extra mixins whose prototype members will be copied to Car.prototype
 
 //Define the Engine mixin
 function Engine() {
