@@ -1,4 +1,4 @@
-Javascript-fastClass
+Javascript-FastClass
 ====================
 A faster and easier way to define Javascript Prototypal Inheritance: `classes` and `mixins`
 
